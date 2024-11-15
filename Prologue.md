@@ -1,6 +1,6 @@
 # Prologue
 
-Here are solutions for challenges in Prologue.
+Here are the solutions to challenges in Prologue.
 
 ## First Terminal
 
@@ -16,13 +16,13 @@ Elf Connect is based on the New York Times [Connections](https://www.nytimes.com
 
 **FOR SILVER AWARD**, one just needs group the words correctly in all 4 rounds.This can be rather time consuming and would involve a fair bit of guesswork, especially where certain words are unfamiliar or quite technical.
 
-The solution can be found in the Javascript code for this puzzle. Open "Developer mode" in the browser (Firefox is used here, but other mainstream browsers should work similar) and navigate to the code for this game. This can be found in the "Debugger" tab for Firefox.
+The solution can be found in the Javascript code for this challenge. Open "Developer mode" in the browser (Firefox is used here, but other mainstream browsers should work similarly) and navigate to the code for this game. This can be found in the "Debugger" tab for Firefox.
 
 ![Answer to Connections](files/Prologue/elfconnect2.png)
 
-The wordsets and solution can be found from line 60 onwards. The wordsets for each round are found in the `wordSets` array, while the array indices for the rod groups are in the `correctSets` array.
+The wordsets and solution can be found from line 60 onwards. The wordsets for each round are found in the `wordSets` dictionary, while the array indices for the correct word groups are in the `correctSets` array.
 
-The `wordSets` array:
+Word list for each round in `wordSets`:
 
 ```
 const wordSets = {
@@ -45,7 +45,7 @@ let correctSets = [
 
 ```
 
-One correct word group for Round 1, can be found at array indices 0, 5, 10 and 14. This corresponds to the words "Tinsel", "Garland", "Star" and "Lights". Another correct group is at array indices 1, 3, 7 and 9, which map to the words "Sleigh", "Bag", "Mittens" and "Gifts". The same goes for the other word sets.
+A correct word group for Round 1 can be found at array indices 0, 5, 10 and 14. This corresponds to the words "Tinsel", "Garland", "Star" and "Lights". Another correct group is at array indices 1, 3, 7 and 9, which map to the words "Sleigh", "Bag", "Mittens" and "Gifts". The same goes for the other word sets.
 
 **FOR GOLD AWARD**, 
 

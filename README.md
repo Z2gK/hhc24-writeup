@@ -9,7 +9,7 @@ Username: gc886
 Links to write-ups for challenges:
 1. [Prologue](Prologue.md)
    - [First Terminal](Prologue.md#first-terminal)
-   - Elf Connect(Prologue.md#elf-connect)
+   - [Elf Connect](Prologue.md#elf-connect)
    - Elf Minder 9000
 2. Act 1
    - cURLing
