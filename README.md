@@ -11,7 +11,7 @@ Links to write-ups for challenges:
    - [First Terminal](Prologue.md#first-terminal)
    - [Elf Connect](Prologue.md#elf-connect)
    - Elf Minder 9000
-2. Act 1
+2. [Act 1](Act1.md)
    - [cURLing](Act1.md#curling)
    - Frosty Keypad
    - Hardware Hacking 101 Parts 1 and 2
