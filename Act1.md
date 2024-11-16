@@ -143,7 +143,7 @@ The path for the v1 API is very similar to that for the current API, as seen in 
 
 ![Code for API call](files/Act1/hw2-1.png)
 
-The password "CandyCaneCrunch77" was used by a previous user and captured in the bash history file. To set enable access for the card with `id = 42`, run the following command: `slh --passcode CandyCaneCrunch77 --set-access 1 --id 42`
+The password "`CandyCaneCrunch77`" was used by a previous user and captured in the bash history file. To set enable access for the card with `id = 42`, run the following command: `slh --passcode CandyCaneCrunch77 --set-access 1 --id 42`
 
 ![Access granted to 42](files/Act1/hw2-2.png)
 
@@ -157,7 +157,7 @@ Fortunately, this database can be viewed and edited with the help of `sqlite3` w
 
 ![Exploring the database](files/Act1/hw2-4.png)
 
-There are two tables in the database - `access_cards` and `config`. The `config` table stores the HMAC secret key `9ed1515819dec61fd361d5fdabb57f41ecce1a5fe1fe263b98c0d6943b9b232e` which would be useful for HMAC generation. it also explains what is being hashed to generate the HMAC, i.e. `access` and `uuid` fields in the `access_cards` database. The uuid field is in the second column of the `access_cards` database, and we can view this information for `id = 42`.
+There are two tables in the database - `access_cards` and `config`. The `config` table stores the HMAC secret key `9ed1515819dec61fd361d5fdabb57f41ecce1a5fe1fe263b98c0d6943b9b232e` which would be useful for HMAC generation. it also explains what is being hashed to generate the HMAC, i.e. `access` and `uuid` fields in the `access_cards` database. The `uuid` field is in the second column of the `access_cards` database, and we can view this information for `id = 42`.
 
 ![Entry for 42](files/Act1/hw2-5.png)
 
@@ -169,6 +169,6 @@ With the following information, the HMAC for the updated entry can be generated 
 - Input: `1c06018b6-5e80-4395-ab71-ae5124560189`
 - Generated HMAC: `135a32d5026c5628b1753e6c67015c0f04e26051ef7391c2552de2816b1b7096`
 
-Finally, the access status for the card with `id = 42` can be changed using the SQL statement `update access_cards set access=1, sig="135a32d5026c5628b1753e6c67015c0f04e26051ef7391c2552de2816b1b7096" where id=42;`. Note that the sig field has to be in quotes because this is a TEXT field, as revealed in the schema.
+Finally, the access status for the card with `id = 42` can be changed using the SQL statement `update access_cards set access=1, sig="135a32d5026c5628b1753e6c67015c0f04e26051ef7391c2552de2816b1b7096" where id=42;`. Note that the `sig` field has to be in quotes because this is a TEXT field, as revealed in the schema.
 
 ![Change access and HMAC](files/Act1/hw2-7.png)

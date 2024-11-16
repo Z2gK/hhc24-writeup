@@ -13,8 +13,10 @@ Links to write-ups for challenges:
    - Elf Minder 9000
 2. [Act 1](Act1.md)
    - [cURLing](Act1.md#curling)
-   - Frosty Keypad
-   - Hardware Hacking 101 Parts 1 and 2
+   - [Frosty Keypad](Act1.md#frosty-keypad)
+   - Hardware Hacking 101
+	 - [Part 1](Act1.md#hardware-hacking-part-1)
+	 - [Part 2](Act1.md#hardware-hacking-part-2)
 
 
 # Interesting finds
