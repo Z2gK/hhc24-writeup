@@ -54,7 +54,7 @@ Since re-direction is involved, the `-L` option should be used: `curl -k -L 'htt
 
 In this challenge, the user to enter the correct codes in order to unlock the safe and achieve the Silver or Gold awards. The UV flashlight will be shown next to the keypad if he has picked up the item.
 
-![Frosty Keypad](files/Act1/frostkeypad1.png))
+![Frosty Keypad](files/Act1/frostkeypad1.png)
 
 This safe is protected by a 5 digit code. By clicking and dragging the flashlight over the keypad, fingerprints will be revealed over the keys **2, 6, 7 and 8**. The correct 5-digit codes very likely consist of these four digits.
 
@@ -68,7 +68,7 @@ Numbers are written on a slip of paper stuck on the safe:
 
 The triplets are clues for the code for **SILVER AWARD**. They refer to letters in the book item that can be picked up on the map and viewed at <https://frost-y-book.com/>. For example, "4:19:3" refers to **page 4**, **19th word**, **3rd letter** in the book, which is the letter "A" from the word "WHAT".
 
-![Frosty Keypad](files/Act1/frostkeypad2.png))
+![Frosty Keypad](files/Act1/frostkeypad2.png)
 
 Proceeding in the same way for the other triplets, the word "SANTA" is formed. Coincidentally, "SANTA" is a word of length 5, same as the number of digits in the code for the safe. This is a clue to the format of the code for the safe - there are 4 distinct letters in "SANTA", with the 2nd and 5th letters ("A") repeated. The safe's code is likely to be of the same form, with 4 distinct digits "2", "6", "7" and "8", and one of these digits being repeated in the 2nd and 5th positions. For example, a possible code is "76286".
 
