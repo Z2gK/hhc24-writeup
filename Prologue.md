@@ -47,7 +47,7 @@ let correctSets = [
 
 A correct word group for Round 1 can be found at array indices 0, 5, 10 and 14. This corresponds to the words "Tinsel", "Garland", "Star" and "Lights". Another correct group is at array indices 1, 3, 7 and 9, which map to the words "Sleigh", "Bag", "Mittens" and "Gifts". The same goes for the other word sets.
 
-**FOR GOLD AWARD**, one can refer to the following hint from Angel Candysalt.
+**FOR GOLD AWARD**, refer to this hint from Angel Candysalt.
 
 > WOW! A high score of 50,000 points! That’s way beyond the limit! With only four rounds and a max of 400 points per round, the top possible score should be 1,600 points. So, how did someone get to 50,000? Something unusual must be happening!
 >
