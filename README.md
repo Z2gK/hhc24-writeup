@@ -12,7 +12,7 @@ Links to write-ups for challenges:
    - [Elf Connect](Prologue.md#elf-connect)
    - Elf Minder 9000
 2. Act 1
-   - cURLing
+   - [cURLing](Act1.md#curling)
    - Frosty Keypad
    - Hardware Hacking 101 Parts 1 and 2
 

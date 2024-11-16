@@ -47,9 +47,15 @@ let correctSets = [
 
 A correct word group for Round 1 can be found at array indices 0, 5, 10 and 14. This corresponds to the words "Tinsel", "Garland", "Star" and "Lights". Another correct group is at array indices 1, 3, 7 and 9, which map to the words "Sleigh", "Bag", "Mittens" and "Gifts". The same goes for the other word sets.
 
-**FOR GOLD AWARD**, 
+**FOR GOLD AWARD**, one can refer to the following hint from Angel Candysalt.
 
-*TBC*
+> WOW! A high score of 50,000 points! That’s way beyond the limit! With only four rounds and a max of 400 points per round, the top possible score should be 1,600 points. So, how did someone get to 50,000? Something unusual must be happening!
+>
+> If you're curious, you might want to check under the hood. Try opening the browser's developer tools console and looking around—there might even be a variable named 'score' that could give you some insights. Sometimes, games hold secrets for those who dig a little deeper. Give it a shot and see what you can discover!
+
+The script increments and checks the current score near line 250. In Firefox developer mode, set a breakpoint at the `scoreText.setText()` function and play one round of the game as usual. Once done with the round, execution will stop at the breakpoint. Switch to the "Console" tab of developer mode and increment the `score` variable beyond 50000 using a statement such as `score += 60000`. Then continue execution so that the condition for `score > 50000` is triggered for the Gold award.
+
+![Code for score checking](files/Prologue/elfconnect3.png)
 
 ## Elf Minder 9000
 
