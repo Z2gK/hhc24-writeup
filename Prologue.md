@@ -59,5 +59,28 @@ The script increments and checks the current score near line 250. In Firefox dev
 
 ## Elf Minder 9000
 
-*TBC*
+This challenge is build around a game that requires the player to lead the elf along a path from the start point to the end, picking up all the crates in the process, within a certain time limit. The player can position "tunnels" and "springs" which would help the elf reach his destination more quickly. While the game is running, the player can also rotate tiles to change the paths temporarily.
+
+![Elf Minder start screen](files/Prologue/elfminder1.png)
+
+![Elf Minder help screen](files/Prologue/elfminder2.png)
+
+When the game is first started, the player is presented with 12 levels.
+
+**FOR SILVER AWARD**, the player just needs to play and successfully clear all 12 levels. The score does not matter as long as the level is cleared within the time limit. Some levels require the rotation of tiles while the game is running.
+
+Once the 12 levels are completed, the 13th level "A Real Pickle" appears. Clearing this level would get the player the **GOLD AWARD**, but it also requires the use of a certain unexpected game behaviour.
+
+This behaviour comes from the `getSpringTarget` function in `guide.js` file. This function determines the point where the elf would land when he encounters a spring. Under normal game behaviour (and from observation of gameplay), he would land on the closest point with a path segment, in the direction of travel. However, if there is another tunnel or spring closest to the elf's position in the direction of travel, he will jump to the first path segment laid down by the player (line 298 - "fix this" comment).
+
+![Elf Minder unexpected behaviour](files/Prologue/elfminder3.png)
+
+This behaviour is key to successfully clearing "A Real Pickle" as the final point is blocked off by obstacles. The screenshot here shows a possible solution for this level. Note that the path leading to the end point (tile in the lower right corner) needs to be laid down FIRST in the editor before any other entities are added. Also, the tile with the L-shaped path (third from left, second from bottom) needs to be rotated in-game so that elf can reach the final crate.
+
+![A Real Pickle solution](files/Prologue/elfminder4.png)
+
+
+
+
+
 
