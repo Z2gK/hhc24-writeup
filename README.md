@@ -1,6 +1,6 @@
 # Solution write-up for SANS Holiday Hack Challenge 2024: Snow-maggedon
 
-Challenges in this year's ![SANS Holiday Hack Challenge](https://www.sans.org/mlp/holiday-hack-challenge-2024/) are released in 4 parts over November and December 2024. Each challenge has an easy and a harder mode. Solving in the easy mode gets the user a "Silver" award, while the harder mode gets him a "Gold".
+Challenges in ![SANS Holiday Hack Challenge 2024](https://www.sans.org/mlp/holiday-hack-challenge-2024/) were released in 4 parts over November and December 2024. Each challenge has an easy and a harder mode. Solving in the easy mode gets the user a "Silver" award, while the harder mode gets him a "Gold".
 
 ![Orientation](files/Prologue/start.png)
 
@@ -17,6 +17,8 @@ Links to write-ups for challenges:
    - Hardware Hacking 101
 	 - [Part 1](Act1.md#hardware-hacking-part-1)
 	 - [Part 2](Act1.md#hardware-hacking-part-2)
+3. Act 2
+4. Act 3
 
 
 # Interesting finds
