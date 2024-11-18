@@ -10,7 +10,7 @@ This challenge is a quiz around the use of the `curl` command line utility.
 
 ![curl challenge](files/Act1/curl1.png))
 
-**FOR SILVER AWARD**, one needs to achieve certain objectives by using `curl` correctly. Here are the questions and answers:
+**FOR SILVER AWARD**, the player needs to achieve certain objectives by using `curl` correctly. Here are the questions and answers:
 
 1. Unlike the defined standards of a curling sheet, embedded devices often have web servers on non-standard ports.  Use curl to retrieve the web page on host "curlingfun" port 8080.
    - `curl "http://curlingfun:8080"`
@@ -52,7 +52,7 @@ Since re-direction is involved, the `-L` option should be used: `curl -k -L 'htt
 
 ## Frosty Keypad
 
-In this challenge, the user to enter the correct codes in order to unlock the safe and achieve the Silver or Gold awards. The UV flashlight will be shown next to the keypad if he has picked up the item.
+In this challenge, the player has to enter the correct codes in order to unlock the safe and achieve the Silver or Gold awards. The UV flashlight will be shown next to the keypad if he has picked up the item.
 
 ![Frosty Keypad with flashlight](files/Act1/frostykeypad1.png)
 
@@ -74,7 +74,7 @@ Proceeding in the same way for the other triplets, the word "SANTA" is formed. C
 
 If this is the case, there are altogether 24 possibilities, because to form such codes, there are 4 choices for the digit at position "A" in "SANTA", and then there will be 3 choices for the digit "S", then 2 choices for the digit at "N", etc., giving us a total of 4 \* 3 \* 2 = 24 possibilities. This is not difficult to brute force and can even be done manually, directly on the keypad.
 
-Still, it is useful to automate this since the same script can be modified and re-used for the Gold award code. From the "Network" tab in the browser's developer mode, one can observe how the code is sent to the server and checked. It is done through the HTTP POST request to `https://hhc24-frostykeypad.holidayhackchallenge.com/submit?id=00000000-0000-0000-0000-000000000000`, with the `id` parameter set to some value. The body contains the submitted code in JSON format, for example:
+Still, it is useful to automate this since the same script can be modified and re-used for the Gold award code. From the "Network" tab in the browser's developer mode, the player can observe how the code is sent to the server and checked. It is done through the HTTP POST request to `https://hhc24-frostykeypad.holidayhackchallenge.com/submit?id=00000000-0000-0000-0000-000000000000`, with the `id` parameter set to some value. The body contains the submitted code in JSON format, for example:
 
 ```
 {"answer":"76286"}
@@ -96,7 +96,7 @@ The correct code for **GOLD AWARD** is **22786**.
 
 ## Hardware Hacking Part 1
 
-After completing the easy mode for the Frosty Keypad challenge, Morcel Nougat and Jewel Loggins will provide useful pointers to help solve the Hardware Hacking Part 1. The first is an archive of 1000 jpg images each of dimension 1x100 here: <https://holidayhackchallenge.com/2024/shreds.zip>, available as an items. The second is the Python script named `heuristic\_edge\_detection.py`, made available through a [link](https://gist.github.com/arnydo/5dc85343eca9b8eb98a0f157b9d4d719) in the hints. 
+After completing the easy mode for the Frosty Keypad challenge, Morcel Nougat and Jewel Loggins will provide links to useful downloads. The first is an archive of 1000 jpg images each of dimension 1x100 here: <https://holidayhackchallenge.com/2024/shreds.zip>, available as an item. The second is the Python script named `heuristic_edge_detection.py`, made available through a [link](https://gist.github.com/arnydo/5dc85343eca9b8eb98a0f157b9d4d719) in the hints. 
 
 Unzipping the archive and running the provided Python script produces a png file named [`assembled_image.png`](files/Act1/assembled_image.png).
 
@@ -129,7 +129,7 @@ The clue for **GOLD AWARD** can be found in the Javascript code `main.js` for th
 
 ![Code for API call](files/Act1/hw1-2.png)
 
-The comment in the code mention that v1 of the API "should" be removed. Perhaps it is not? This API call helps to check if the connection settings are correct by querying the server via a POST request. This request is sent whenever the "S" button is pressed. By observing the network traffic in the "Network" tab of the browser's developer mode, it can be seen that this API call is sent to the endpoint <https://hhc24-hardwarehacking.holidayhackchallenge.com/api/v2/complete>, with a JSON formatted structure in the body:
+A comment in the code mention that v1 of the API "should" be removed. Perhaps not? This API call helps to check if the connection settings are correct by querying the server via a POST request. This request is sent whenever the "S" button is pressed. By observing the network traffic in the "Network" tab of the browser's developer mode, it can be seen that this API call is sent to the endpoint <https://hhc24-hardwarehacking.holidayhackchallenge.com/api/v2/complete>, with a JSON formatted structure in the body of this format:
 
 ```
 {"requestID":"00000000-0000-0000-0000-000000000000","serial":[3,9,2,2,0,3],"voltage":3} 
@@ -139,15 +139,15 @@ The path for the v1 API is very similar to that for the current API, as seen in 
 
 ## Hardware Hacking Part 2
 
-**FOR SILVER AWARD**, the user is required to set access permissions for the card with `id = 42` using the `slh` binary (Santa's Little Helper). Changes are password protected, but the password can be view in the `.bash_history` file once the user is booted into the card access system.
+**FOR SILVER AWARD**, the player is required to set access permissions for the card with `id = 42` using the `slh` binary (Santa's Little Helper). Changes are password protected, but the password can be view in the `.bash_history` file once the player is booted into the card access system.
 
 ![Code for API call](files/Act1/hw2-1.png)
 
-The password "`CandyCaneCrunch77`" was used by a previous user and captured in the bash history file. To set enable access for the card with `id = 42`, run the following command: `slh --passcode CandyCaneCrunch77 --set-access 1 --id 42`
+The password "`CandyCaneCrunch77`" was used by a previous user and captured in the bash history file. To enable access for the card with `id = 42`, run the following command: `slh --passcode CandyCaneCrunch77 --set-access 1 --id 42`
 
 ![Access granted to 42](files/Act1/hw2-2.png)
 
-For **GOLD AWARD**, one needs to be modify the access card database directly to change the access permissions for the card with `id = 42`. This database is stored in the `access_cards` file and is an SQLite database. 
+For **GOLD AWARD**, the player needs to modify the access card database directly to change the access permissions for the card with `id = 42`. This database is stored in the `access_cards` file and is an SQLite database. 
 
 ![Access granted to 42](files/Act1/hw2-3.png)
 

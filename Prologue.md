@@ -14,7 +14,7 @@ Elf Connect is based on the New York Times [Connections](https://www.nytimes.com
 
 ![Elf Connect Round 1](files/Prologue/elfconnect1.png)
 
-**FOR SILVER AWARD**, one just needs group the words correctly in all 4 rounds.This can be rather time consuming and would involve a fair bit of guesswork, especially where certain words are unfamiliar or quite technical.
+**FOR SILVER AWARD**, the player just needs group the words correctly in all 4 rounds.This can be rather time consuming and would involve a fair bit of guesswork, especially where certain words are unfamiliar or quite technical.
 
 The solution can be found in the Javascript code for this challenge. Open "Developer mode" in the browser (Firefox is used here, but other mainstream browsers should work similarly) and navigate to the code for this game. This can be found in the "Debugger" tab for Firefox.
 
@@ -53,7 +53,7 @@ A correct word group for Round 1 can be found at array indices 0, 5, 10 and 14. 
 >
 > If you're curious, you might want to check under the hood. Try opening the browser's developer tools console and looking around—there might even be a variable named 'score' that could give you some insights. Sometimes, games hold secrets for those who dig a little deeper. Give it a shot and see what you can discover!
 
-The script increments and checks the current score near line 250. In Firefox developer mode, set a breakpoint at the `scoreText.setText()` function and play one round of the game as usual. Once done with the round, execution will stop at the breakpoint. Switch to the "Console" tab of developer mode and increment the `score` variable beyond 50000 using a statement such as `score += 60000`. Then continue execution so that the condition for `score > 50000` is triggered for the Gold award.
+The script increments and checks the current score near line 250. In Firefox developer mode, set a breakpoint at the `scoreText.setText()` function and play a round of the game normally. Once done with the round, execution will stop at the breakpoint. Switch to the "Console" tab of developer mode and increment the `score` variable beyond 50000 using a statement such as `score += 60000`. Then continue execution so that the condition for `score > 50000` is triggered for the Gold award.
 
 ![Code for score checking](files/Prologue/elfconnect3.png)
 
