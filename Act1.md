@@ -66,13 +66,13 @@ Numbers are written on a slip of paper stuck on the safe:
 - 3:10:4
 - 14:8:3
 
-The triplets are clues for the code for **SILVER AWARD**. They refer to letters in the book item that can be picked up on the map and viewed at <https://frost-y-book.com/>. For example, "4:19:3" refers to **page 4**, **19th word**, **3rd letter** in the book, which is the letter "A" from the word "WHAT".
+The triplets are clues for the code for **SILVER AWARD**. They refer to letters in the book item that can be picked up on the map and viewed at <https://frost-y-book.com/>. For example, "4:19:3" refers to "**page 4**, **19th word**, **3rd letter**" in the book, which is the letter "A" from the word "WHAT".
 
 ![Book of hints](files/Act1/frostykeypad2.png)
 
-Proceeding in the same way for the other triplets, the word "SANTA" is formed. Coincidentally, "SANTA" is a word of length 5, same as the number of digits in the code for the safe. This is a clue to the format of the code for the safe - there are 4 distinct letters in "SANTA", with the 2nd and 5th letters ("A") repeated. The safe's code is likely to be of the same form, with 4 distinct digits "2", "6", "7" and "8", and one of these digits being repeated in the 2nd and 5th positions. For example, a possible code is "76286".
+Proceeding in the same way for the other triplets, the word "SANTA" is formed. Coincidentally, "SANTA" is a word of length 5, similar to the number of digits in the code for the safe. This is a clue to the format of the code for the safe - there are 4 distinct letters in "SANTA", with the 2nd and 5th letters ("A") repeated. The safe's code is likely to be of the same form, with 4 distinct digits "2", "6", "7" and "8", and one of these digits being repeated in the 2nd and 5th positions. For example, a possible code is "76286".
 
-If this is the case, there are altogether 24 possibilities, because to form such codes, there are 4 choices for the digit at position "A" in "SANTA", and then there will be 3 choices for the digit "S", then 2 choices for the digit at "N", etc., giving us a total of 4 \* 3 \* 2 = 24 possibilities. This is not difficult to brute force and can even be done manually, directly on the keypad.
+If this is the case, there are altogether 24 possibilities, because to form such codes, there are 4 choices for the digit at position "A" in "SANTA", and then there will be 3 choices for the digit "S", then 2 choices for the digit at "N", etc., giving a total of 4 \* 3 \* 2 = 24 possibilities. This is not difficult to brute force and can even be done manually, directly on the keypad.
 
 Still, it is useful to automate this since the same script can be modified and re-used for the Gold award code. From the "Network" tab in the browser's developer mode, the player can observe how the code is sent to the server and checked. It is done through the HTTP POST request to `https://hhc24-frostykeypad.holidayhackchallenge.com/submit?id=00000000-0000-0000-0000-000000000000`, with the `id` parameter set to some value. The body contains the submitted code in JSON format, for example:
 
@@ -86,9 +86,9 @@ For incorrect guesses, the response contains another JSON structure with an erro
 {"error":"The data you've provided seems to have gone on a whimsical adventure, losing all sense of order and coherence!"} 
 ```
 
-A script can be written to automate code guesses. [This Python script](files/Act1/bruteforce.py) sends all of the 24 possiblities to the server and outputs the raw JSON response. The POST requests work even when the `id` parameter is set to `null`, but the `Content-Type` header should be set to `application/json`. Also, the script throttles the requests to a rate of less than 1 request per second through a `sleep` function as the server is observed to limit the rate of requests from IP addresses.
+A script can be written to automate code guesses. [This Python script](files/Act1/bruteforce.py) sends all of the 24 possiblities to the server and outputs the raw JSON response. The POST requests work even when the `id` parameter is set to `null`, but the `Content-Type` header should be set to `application/json`. Also, the script throttles the requests to a rate of less than 1 request per second through a `sleep` function as the server is observed to limit the rate of requests.
 
-The correct code for **SILVER AWARD** is **72682**. The server returns the response of `{"output":"success"}` when the correct guess is sent.
+The correct code for **SILVER AWARD** is **72682**. The server returns the response of `{"output":"success"}` when the correct guess is received.
 
 For the **GOLD AWARD** code, the brute-forcing script needs to be modified. Assuming this 5-digit code uses the same digits "2", "6", "7" and "8", there are altogether 4 \* 4 \* 4 \* 4 \* 4 = 1024 possibilities (1023 if the Silver award "72686" code is excluded). At about 1 second per try, brute-forcing is still feasible, but the script needs to be modified. [This other Python script](files/Act1/bruteforce_gold.py) sends guesses to the server at a rate of 1 per second and stops once the correct code is found.
 
