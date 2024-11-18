@@ -81,7 +81,7 @@ This behaviour is key to successfully clearing "A Real Pickle" as the final poin
 
 ### Elf Minder - alternative solution
 
-It is also possible to clear the 12 levels for Silver (and possibly for Gold as well) using a different approach. In the Javascript file `game2.js`, the status of the constant `isEditor` is checked (line 522) and if it evaluates to `true`, then an admin control panel is displayed. In Firefox developer mode, the code can be tampered with by acessing the "Debugging" tab, "Source" panel, right clicking on the `game2.js` file, and turning on "Add script override". This saves the file locally and allows user modification of the script. The browser would use the copy of the script on disk instead of the original downloaded copy as long as the script override option is switched on.
+It may be possible to clear the 12 levels for Silver (and possibly for Gold as well) with a different approach. In the Javascript file `game2.js`, the status of the constant `isEditor` is checked (line 522) and if it evaluates to `true`, an admin control panel is displayed. In Firefox developer mode, the code can be tampered with by acessing the "Debugging" tab, "Source" panel, right clicking on the `game2.js` file, and turning on the "Add script override" option. This saves the file locally and allows user modification of the script. The browser would use the copy of the script on disk instead of the original downloaded copy as long as the script override option is switched on.
 
 In this case, to activate the admin panel, line 520 should be commented out and a new statement `isEditor = true;` added immediately after.
 
