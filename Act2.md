@@ -4,7 +4,7 @@ Act 2 consists of 5 challenges.
 
 ## Mobile Analysis
 
-For this challenge, it is best to decompile the apk/aab into Java code for better readability. This can be done using the tool `jadx`. The missing name can found by inspecting the Java code for each version of the app.
+For this challenge, it is best to decompile the apk/aab into Java code for better readability. This can be done using the tool `jadx`. The missing name can found by inspecting the Java code for each version of the app. The objective is to find excluded names from Santa's lists.
 
 **FOR SILVER AWARD**, first run `jadx SantaSwipe.apk` to decompile the apk. Ignore the errors. The files will be stored in a newly created directory named `SantaSwipe`. The two files are interest are in the `SantaSwipe/sources/com/northpole/santaswipe` directory, namely `DatabaseHelper.java` and `MainActivity.java`.
 
@@ -57,7 +57,7 @@ These strings are then inserted into SQL statements in obfuscated form, as seen 
 
 These statements are for the insertion of names. The statement for excluding a name is likely elsewhere.
 
-There is a long SQL statement near the top of the same file. The function `decryptData` is run to decrypt this statement before it is executed.
+There is a long SQL statement near the top of the same file. The function `decryptData` decrypts this statement (base64 encoded ciphertext) before it is executed.
 
 ```
         db.execSQL(decryptData("IVrt+9Zct4oUePZeQqFwyhBix8cSCIxtsa+lJZkMNpNFBgoHeJlwp73l2oyEh1Y6AfqnfH7gcU9Yfov6u70cUA2/OwcxVt7Ubdn0UD2kImNsclEQ9M8PpnevBX3mXlW2QnH8+Q+SC7JaMUc9CIvxB2HYQG2JujQf6skpVaPAKGxfLqDj+2UyTAVLoeUlQjc18swZVtTQO7Zwe6sTCYlrw7GpFXCAuI6Ex29gfeVIeB7pK7M4kZGy3OIaFxfTdevCoTMwkoPvJuRupA6ybp36vmLLMXaAWsrDHRUbKfE6UKvGoC9d5vqmKeIO9elASuagxjBJ"));
@@ -113,7 +113,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
     }
 ```
 
-Tracing the definitions backwards, `this.iv` is derived from `decode2`, which is from `obj2`. `obj2` is from `string2`, which is originally from **`R.string.iv`**.
+Tracing the definitions backwards, `this.iv` is derived from `decode2`, which is from `obj2`. This is from `string2`, which is originally from **`R.string.iv`**.
 
 Similarly for `this.secretKeySpec`, this is the chain of definitions: `R.string.ek -> string -> obj -> decode -> this.secretKeySpec`. Hence `this.secretKeySpec` is ultimately derived from **`R.string.ek`**.
 
@@ -126,7 +126,7 @@ These definitions can be found in the file `R.java` in the same directory.
         public static int iv = 0x7f090037;
 ```
 
-These values are just references (resource IDs) produced during decompilation. The actual values of the encryption key and IV are elsewhere.
+These values are just references (resource IDs) produced during decompilation. The actual values of the encryption key and IV are defined elsewhere.
 
 These resources can be found stored in the `SantaSwipeSecure/resources/res/values/strings.xml` file after some search.
 
@@ -140,22 +140,22 @@ These resources can be found stored in the `SantaSwipeSecure/resources/res/value
     <string name="m3c_bottom_sheet_pane_title">Bottom Sheet</string>
 ```
 
-The values `ek` and `iv` are base64 encoded. This are their values in hex:
+The values `ek` and `iv` are base64 encoded. These are their values in hex:
 
 ```
 ek: ae60c9d7027b66d2b2de590bb3a5fd6d9d89be9b7a8cbe985a20ec5ed823917c
 iv: 436865636b4d617465726978 (CheckMaterix)
 ```
 
-Decoding can be done on the linux command line (`echo -n <b64string> | base64 -d | hexdump -C`) or in the CyberChef tool. 
+Decoding can be done on the linux command line (`echo -n <b64string> | base64 -d | hexdump -C`) or in the [CyberChef](https://gchq.github.io/CyberChef/) tool. 
 
-Going back to the encrypted SQL statement in `DatabaseHelper.java`, the base64 encoded (encrypted) string decodes to (use From Base64, To Hex in CyberChef):
+Going back to the encrypted SQL statement in `DatabaseHelper.java`, the base64 encoded (encrypted) ciphertext string decodes to the following (use From Base64, To Hex in CyberChef):
 
 ```
 215aedfbd65cb78a1478f65e42a170ca1062c7c712088c6db1afa525990c369345060a07789970a7bde5da8c8487563a01faa77c7ee0714f587e8bfabbbd1c500dbf3b073156ded46dd9f4503da422636c725110f4cf0fa677af057de65e55b64271fcf90f920bb25a31473d088bf10761d8406d89ba341feac92955a3c0286c5f2ea0e3fb65324c054ba1e525423735f2cc1956d4d03bb6707bab1309896bc3b1a9157080b88e84c76f607de548781ee92bb3389191b2dce21a1717d375ebc2a133309283ef26e46ea40eb26e9dfabe62cb3176805acac31d151b29f13a50abc6a02f5de6faa629e20ef5e9404ae6a0c63049
 ```
 
-Since AES-GCM is an authenticated mode of operation, an authentication tag is usually appended to the end of the ciphertext. The length of this tag is not specified in the code. A tag length of 12 bytes is usually used, but it can be any length up to 16 bytes (AES block size). Since the GCM tag is required for AES GCM mode decryption in CyberChef, it is necessary to try different lengths and see if decryption success. For example, if the GCM tag is 8 bytes long, then the `e9404ae6a0c63049` should be entered into the GCM tag field and DELETED from the ciphertext. The key should be set to `ek` and the IV to `iv`.
+Since AES-GCM is an authenticated mode of operation, an authentication tag is usually appended to the end of the ciphertext. The length of this tag is not specified in the code. A tag length of 12 bytes is usually used, but it can be any length up to 16 bytes (AES block size). Since the GCM tag is required for AES GCM mode decryption in CyberChef, it is necessary to try different lengths and see if decryption succeeds. For example, if the GCM tag is 8 bytes long, then the string `e9404ae6a0c63049` should be entered into the GCM tag field and DELETED from the ciphertext. The key should be set to `ek` and the IV to `iv`.
 
 After some trials, decryption succeeds with a GCM tag of 16 bytes with the following as the plaintext output:
 
@@ -168,7 +168,7 @@ CREATE TRIGGER DeleteIfInsertedSpecificValue
     END;
 ```
 
-This is a deletion statement for the encrypted string "KGfb0vd4u/4EWMN0bp035hRjjpMiL4NQurjgHIQHNaRaDnIYbKQ9JusGaa1aAkGEVV8=" (since base64 decoding yields gibberish). Once again, repeat the decryption process with the same encryption key, IV and GCM tag length of 16 bytes to obtain the following:
+This is a deletion statement for the encrypted string `KGfb0vd4u/4EWMN0bp035hRjjpMiL4NQurjgHIQHNaRaDnIYbKQ9JusGaa1aAkGEVV8=` (it is likely to be encrypted since direct base64 decoding yields gibberish). Once again, repeat the decryption process with the same encryption key, same IV and GCM tag (last 16 bytes of this new ciphertext) to obtain the following:
 
 ```
 Joshua, Birmingham, United Kingdom
