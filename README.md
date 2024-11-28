@@ -17,7 +17,7 @@ Links to write-ups for challenges:
 	 - [Part 2](Act1.md#hardware-hacking-part-2)
 3. [Act 2](Act2.md)
    - [Mobile Analysis](Act2.md#mobile-analysis)
-   - Drone Path
+   - [Drone Path](Act2.md#drone-path)
    - Microsoft KC7
    - Powershell
    - Snowball Showdown
