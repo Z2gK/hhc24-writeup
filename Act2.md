@@ -176,3 +176,93 @@ Joshua, Birmingham, United Kingdom
 
 The name missing from the table `NormalList` is **Joshua**.
 
+
+## Drone Path
+
+Clicking on the burger menu at the top-right corner of the frame would reveal a menu with three items - Home, FileShare and Login. The Login option brings the player to a login screen that prompts for the username and password. The FileShare page has a link to a file named `fritjolf-Path.kml`.
+
+For visualization, this kml file can be downloaded and then imported into Google Earth. The kml code in the file traces out a path that spells "GUMDROP1"
+
+![Initial password](files/Act2/dronepath1.png)
+
+The filename of the kml file hints at the username for the login screen. Indeed, access can be gained with following credentials:
+
+- Username: **fritjolf**
+- Password: **GUMDROP1**
+
+Once logged in, a few more items will show up in the drop down menu - Workshop, Profile and Admin Console. The Profile page provides the link to a csv file `Preparations-drone-name.csv` while the Admin Console has a text field for the submission of a code for drone fleet administration.
+
+The Workshop page has a text field for the entry of drone names. Incidentally, this field is vulnerable to SQL injection. Entering the basic SQL injection string `' OR 1=1--` suffices to reveal entries in the backend database.
+
+![SQL injection](files/Act2/dronepath-sqli.png)
+
+Four drones are shown in the output - ELF-HAWK, Pigeon-Lookalike-v4, FlyingZoomer and Zapper. Due to space constraint, not all comments for every drone can be displayed. Full comments can be seen in the Network tab output in the browser's developer mode for all drones:
+
+```
+{"comments":["These drones will work great to find Alabasters snowball warehouses.\n I have hid the activation code in the dataset <a href='../files/secret/ELF-HAWK-dump.csv'>ELF-HAWK-dump.csv</a>. We need to keep it safe, for now it's under /files/secret.","We need to make sure we have enough of these drones ready for the upcoming operation. \n Well done on hiding the activation code in the dataset.\n If anyone finds it, it will take them a LONG time or forever to carve the data out, preferably the LATTER."],"drone_name":"ELF-HAWK"} 
+```
+
+```
+{"comments":["This is a great drone for surveillance, but we need to keep it out of the rain.","I cant believe we are using pigeons for surveillance. \n If anyone finds out, there will most likely be a conspiracy theory about it.","I heard a rumor that there is something fishing with some of the files. \nThere was some talk about only TRUE carvers would find secrets and that FALSE ones would never find it."],"drone_name":"Pigeon-Lookalike-v4"} 
+```
+
+```
+{"comments":["This drone is perfect for dropping snowballs on unsuspecting targets."],"drone_name":"FlyingZoomer"} 
+```
+
+```
+{"comments":["This is sort of primitive, but it works!"],"drone_name":"Zapper"}
+```
+
+The comments for ELF-HAWK point to a file stored at `/files/secret/ELF-HAWK-dump.csv`. This file can be downloaded and examined in any spreadsheet application. Note that there is a missing newline in the header row of the csv file which needs to be fixed before it can be opened correctly.
+
+There is also a hint that suggests finding the code in the LATitude and LONGitude data, which is useful for the **SILVER AWARD**:
+
+> We need to make sure we have enough of these drones ready for the upcoming operation. Well done on hiding the activation code in the dataset. If anyone finds it, it will take them a LONG time or forever to carve the data out, preferably the LATTER.
+
+This hint points to the `OSD.longitude` and `OSD.latitude` columns in `ELF-HAWK-dump.csv`. It should be noted that longitude values should range from -180 to 180 degrees, but there are many values in the `OSD.longitude` column that are greater than 180, suggesting that the data should be plotted on a surface without any wraparound. A [short Python script](files/Act2/plot-elf-hawk.py) using the matplotlib module can be used to plot this data:
+
+```
+import pandas as pd
+from matplotlib import pyplot as plt
+
+elfhawkdata = pd.read_csv("ELF-HAWK-dump-latlong.csv")
+plt.plot( elfhawkdata.longitude,elfhawkdata.latitude)
+plt.show()
+```
+
+The two columns has been extracted, their headers renamed and saved to a file named [`ELF-HAWK-dump-latlong.csv`](files/Act2/ELF-HAWK-dump-latlong.csv) prior to running this script. The plot generated traces out the code "**DroneDataAnalystExpertMedal**", which when entered into the text field in the Admin Console, claims the **SILVER AWARD** for this challenge.
+
+![Activation code for Silver](files/Act2/dronepath2.png)
+
+**FOR GOLD AWARD**, refer to the hint from the comments for the drone Pigeon-Lookalike-v4.
+
+> I heard a rumor that there is something fishing with some of the files. There was some talk about only TRUE carvers would find secrets and that FALSE ones would never find it.
+
+"Carving" is a term in computer forensics to refer to the reassembly of files from raw data fragments. The hint suggests that the TRUE and FALSE values in certain columns in `ELF-HAWK-dump.csv` may lead to the next code.
+
+There are a total of 58 columns in `ELF-HAWK-dump.csv` that consists exclusively of TRUE/FALSE strings. To reveal the code for Gold, these need to be converted to binary values (TRUE for 1 and FALSE for 0). This can be done using a spreadsheet application and the [CyberChef](https://gchq.github.io/CyberChef/) tool. First it is necessary to delete the columns that do not have TRUE/FALSE strings.
+
+![TRUE FALSE columns](files/Act2/dronepath3.png)
+
+Then, create 58 new columns immediate to the right of this table and use a formula to populate the new cells with "1" and "0" strings according to TRUE/FALSE values in the corresponding cells. Do this for all 3273 rows of data.
+
+![Populating with ones and zeros](files/Act2/dronepath4.png)
+
+In a new column to the right, use another formula to concatenate the "1" and "0" strings for all rows.
+
+![Concatenated binary values](files/Act2/dronepath5.png)
+
+Next, copy out and save this column of ones and zeros into a new csv file, excluding the header. In CyberChef, select the "From Binary" recipe and upload this csv file. The binary data decodes to ASCII characters which form ASCII art. The codeword can be seen near the end of the output.
+
+![Decoding the binary data](files/Act2/dronepath6.png)
+
+Finally, enter **EXPERTTURKEYCARVERMEDAL** in the Admin Console to claim the **GOLD AWARD**.
+
+### A different approach
+
+The file `Preparations-drone-name.csv` has not been used in the write-up for Gold and Silver here. It is in fact the clue for one of the drone's name. This file can be imported into [Google MyMaps](https://www.google.com/mymaps) and then opened in Google Earth. There is a total of 8 points which when zoomed in and examined in sequence in Google Earth, reveal surface features that resemble the characters that spell out the name "ELF-HAWK".
+
+![The letter E](files/Act2/dronepath7.jpg)
+
+The player can then enter "ELF-HAWK" as the drone name in the Workshop to obtain `ELF-HAWK-dump.csv` and the clue for Silver. Once the codeword for Silver is obtained, a hint about an "injection" vulnerability will be dropped, and the player can go on to discover the other drone names and comments from the Workshop, eventually leading to the Gold codeword.
