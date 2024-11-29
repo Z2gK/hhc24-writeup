@@ -377,7 +377,7 @@ $r2.RawContent }
 
 ![Setting cookie attempts](files/Act2/powershell3.png)
 
-The "Set-Cookie" header used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
+The `Set-Cookie` header used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
 
 ```
 $tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; 
@@ -395,13 +395,115 @@ $r2.RawContent }
 
 ![Setting cookie attempts](files/Act2/powershell4.png)
 
-With this, the value of the `attempts` cookie has changed and it completes the **GOLD** challenge.
+This changes the value of the `attempts` cookie and it completes the **GOLD** challenge.
 
 
 ## Snowball Showdown
 
-This is a game where the player plays against Wombley in a snowball fight. In order to play and win, the player needs to be joined by a second player. There is a single player mode where the player can practice throwing snowballs and test out any code modifications, but the game is not scored.
+This is a game where the player plays against Wombley in a snowball fight. In order to complete the challenge, the player needs to be joined by a second player (Random Match Making). There is also a single player mode (Create Private Room option) where the player can practice throwing snowballs and test out any code modifications, but the game is not scored or timed.
 
+![Game start screen](files/Act2/snowball1.png)
+
+![Gameplay screen](files/Act2/snowball2.png)
+
+There is a **BRONZE AWARD** for this game, which only requires the player to win in a game against Wombley without any modification of client-side code.
+
+**FOR SILVER AWARD**, the player needs to cheat and win in a game. The conversation with Dusty Giftwrap hints at the tweaking of client-side code:
+
+> Take down Wombley the usual way with a friend, or try a different strategy by tweaking client-side values for an extra edge.
+> 
+> Alternatively, we've got a secret weapon - a giant snow bomb - but we can't remember where we put it or how to launch it.
+>
+> Adjust the right elements and victory for Alabaster can be secured with more subtlety. Intriguing, right?
+
+> Christmas is on the line! For a mischievous edge-up, dive into the game’s code - a few client-side tweaks to speed, movement, or power might shift the balance... or just help us find that secret weapon we misplaced!
+
+During gameplay, the following script files (or files containing scripts) are loaded. These can be viewed and downloaded in Chrome browser's developer mode:
+
+- `game.html`
+- `elfIds.js`
+- `phaser.min.js`
+- `reconnecting-websocket.min.js`
+- `phaser-snowball-game.js`
+
+There are many ways to tweak client-side code so that the player has an advantage. The approach described here may not cover all of them. The parameters of interest can be found in `phaser-snowball-game.js`, near the start of the file.
+
+```
+class SnowBallGame extends Phaser.Scene {
+    constructor() {
+        super({ key: "game" });
+        this.hasBgDebug = typeof window.bgDebug !== 'undefined'
+        this.groundOffset = groundOffset;
+        this.yellowTint = 0xffeb99;
+        this.blueTint = 0x99ddff;
+        this.snowballLiveTime = 12000;
+        this.healingTerrain = true;
+        this.terrainHealDelay = 15000;
+        this.elfGroundOffset = GAME_HEIGHT - 115;
+        this.wombleyXLocation = GAME_WIDTH - 40;
+        this.alabasterXLocation = 40;
+        this.playerMoveSpeed = 150;
+        this.lastTimePlayerArrowsFromUpdate = 0
+        this.lastTimePlayerArrowsFromUpdateDelay = 20
+        this.percentageShotPower = 0;
+        this.alabasterElvesThrowDelayMin = 1500;
+        this.alabasterElvesThrowDelayMax = 2500;
+        this.wombleyElvesThrowDelayMin = 1500;
+        this.wombleyElvesThrowDelayMax = 2500;
+        this.wombleyElvesIncompacitateTime = 5000;
+        this.alabasterElvesIncompacitateTime = 5000;
+        this.playerIncompacitateTime = 5000;
+        this.throwSpeed = 1000;
+        this.throwRateOfFire = 1000;
+        this.lastThrowTime = 0;
+        this.mouseIsOverCanvas = false;
+        this.lastPointerPosition = { x: 0, y: 0 };
+        this.tempMatrix = new Phaser.GameObjects.Components.TransformMatrix();
+		...
+```
+
+The variable `this.playerMoveSpeed` can be found in a few lines later in the same script file. It is used in statements similar to the line here.
+
+```
+let futurePosOffset = -(this.playerMoveSpeed * (delta / 1000));
+```
+
+It appears to determine the player's offset at each update. The larger the value of `this.playerMoveSpeed`, the larger the magnitude of offset. Hence a LARGER value of `this.playerMoveSpeed` would enable the player to move FASTER.
+
+Another variable `this.throwRateOfFire` appears to be related to the rate at which snowballs can be thrown by the player. It is used once in the `calcSnowballTrajectory()` function in the script:
+
+```
+// Check if the percentage shot power is zero or if the throw rate limit
+ is exceeded
+if ((this.percentageShotPower <= 0 || this.lastThrowTime + this.throwRateOfFire > this.time.now) && !archonly) {
+```
+
+As suggested in the comment, one intention of this conditional statement is to check if the throw rate limit is exceeded, i.e. the player should not be able to throw another snowball too soon after the previous one was thrown. This condition will be satisfied when `this.lastThrowTime + this.throwRateOfFire > this.time.now` evaluates to true. It works by comparing the time of last throw with the current time, and if the time difference is smaller than `this.throwRateOfFire`, then the condition evaluates to false. Hence, to enable the player to throw snowballs in quicker succession, `this.throwRateOfFire` should be set to a SMALLER value.
+
+There are various other interesting variables such as `this.alabasterElvesThrowDelayMin`, `this.alabasterElvesThrowDelayMax`, `this.alabasterElvesIncompacitateTime` and `this.playerIncompacitateTime` etc, but they are either not used at all in the code or commented out.
+
+Using the "Override content" function in the Sources tab in Chrome, the player can maintain a local modified copy of `phaser-snowball-game.js`. **FOR SILVER AWARD**, the player can try to play and win a game with `this.playerMoveSpeed` and `this.throwRateOfFire` modified to the following values, for example:
+
+- `this.playerMoveSpeed = 600;`
+- `this.throwRateOfFire = 5;`
+
+**FOR GOLD AWARD**, the player needs to launch a secret weapon. The code for this weapon is found in the script `reconnecting-websocket.min.js`.
+
+![Code for bomb](files/Act2/snowball3.png)
+
+The function `window.bgDebug` takes an argument `e` which appears to be a Javascript *object* (key-value pair) since it has a property `type` which is checked at the start of the function. The code with the `if` block has some mention of a "bomb", so this is likely to be the secret weapon. One of the conditions for the `if` statement to evaluate to true is for the value `e.type` to be equal to the string "`moasb_start`".
+
+To trigger the secret weapon, the player can start the game, go into the browser's developer mode and run the following statements in the Console tab:
+
+```
+var foo = { type: "moasb_start" }; window.bgDebug(foo)
+```
+
+This creates a new object `foo`, assigns the string `moasb_start` to `foo.type` and runs the function `window.bgDebug` with this object as the argument.
+
+![Secret weapon](files/Act2/snowball4.png)
+
+Triggering this secret weapon in single or multiplayer modes will claim the player the **GOLD AWARD**.
 
 ## Microsoft KC7
 
