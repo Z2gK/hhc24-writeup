@@ -21,10 +21,10 @@ Links to write-ups for challenges:
    - [Powershell](Act2.md#powershell)
    - [Snowball Showdown](Act2.md#snowball-showdown)
    - [Microsoft KC7](Act2.md#microsoft-kc7)
-	 - Part 1
-	 - Part 2
-	 - Part 3
-	 - Part 4
+	 - Section 1
+	 - Section 2
+	 - Section 3
+	 - Section 4
 4. Act 3
 
 

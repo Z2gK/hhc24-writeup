@@ -2,6 +2,12 @@
 
 Act 2 consists of 5 challenges.
 
+1. [Mobile Analysis](#mobile-analysis)
+2. [Drone Path](#drone-path)
+3. [Powershell](#powershell)
+4. [Snowball Showdown](#snowball-showdown)
+5. [Microsoft KC7](#microsoft-kc7)
+
 ## Mobile Analysis
 
 For this challenge, it is best to decompile the apk/aab into Java code for better readability. This can be done using the tool `jadx`. The missing name can found by inspecting the Java code for each version of the app. The objective is to find excluded names from Santa's lists.
@@ -507,7 +513,7 @@ Triggering this secret weapon in single or multiplayer modes will claim the play
 
 ## Microsoft KC7
 
-There are four sections to this challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. Completion of 2 sections gives the player a **SILVER AWARD** while completing 4 gives **GOLD**. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
+There are four sections to this challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. Completion of two sections gives the player a **SILVER AWARD** while completing four gives **GOLD**. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
 
 
 

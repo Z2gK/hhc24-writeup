@@ -4,6 +4,13 @@ There are two items on this map. One is a UV flashlight and the other is a book 
 
 ![UV flashlight and Frosty Book](files/Act1/uv+frostybook.png)
 
+1. [cURLing](#curling)
+2. [Frosty Keypad](#frosty-keypad)
+3. Hardware Hacking 101
+   - [Part 1](#hardware-hacking-part-1)
+   - [Part 2](#hardware-hacking-part-2)
+
+
 ## cURLing
 
 This challenge is a quiz around the use of the `curl` command line utility.

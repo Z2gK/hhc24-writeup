@@ -2,6 +2,10 @@
 
 Here are the solutions to challenges in Prologue.
 
+1. [First Terminal](#first-terminal)
+2. [Elf Connect](#elf-connect)
+3. [Elf Minder 9000](#elf-minder-9000)
+
 ## First Terminal
 
 This challenge is meant as an orientation. A terminal is launched when the challenge is started. Simply follow the on-screen instructions and enter **answer**. There is no Gold or Silver award.
