@@ -18,9 +18,13 @@ Links to write-ups for challenges:
 3. [Act 2](Act2.md)
    - [Mobile Analysis](Act2.md#mobile-analysis)
    - [Drone Path](Act2.md#drone-path)
-   - Microsoft KC7
-   - Powershell
-   - Snowball Showdown
+   - [Powershell](Act2.md#powershell)
+   - [Snowball Showdown](Act2.md#snowball-showdown)
+   - [Microsoft KC7](Act2.md#microsoft-kc7)
+	 - Part 1
+	 - Part 2
+	 - Part 3
+	 - Part 4
 4. Act 3
 
 

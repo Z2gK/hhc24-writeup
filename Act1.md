@@ -149,7 +149,7 @@ The password "`CandyCaneCrunch77`" was used by a previous user and captured in t
 
 For **GOLD AWARD**, the player needs to modify the access card database directly to change the access permissions for the card with `id = 42`. This database is stored in the `access_cards` file and is an SQLite database. 
 
-![Access granted to 42](files/Act1/hw2-3.png)
+![File listing](files/Act1/hw2-3.png)
 
 Also provided in the hint is a [link to a CyberChef page](https://gchq.github.io/CyberChef/#recipe=HMAC(%7B'option':'UTF8','string':''%7D,'SHA256')) for the calculation of HMAC.
 

