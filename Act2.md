@@ -400,7 +400,7 @@ This changes the value of the `attempts` cookie and it completes the **GOLD** ch
 
 ## Snowball Showdown
 
-This is a game where the player plays against Wombley in a snowball fight. In order to complete the challenge, the player needs to be joined by a second player (Random Match Making). There is also a single player mode (Create Private Room option) where the player can practice throwing snowballs and test out any code modifications, but the game is not scored or timed.
+This is a game where the player plays against Wombley in a snowball fight. In order to complete the challenge, the player needs to be joined by a second player (Random Match Making). There is also a single player mode (Create Private Room) where the player can practice throwing snowballs and test out any code modifications, but the game is not scored or timed.
 
 ![Game start screen](files/Act2/snowball1.png)
 
@@ -418,7 +418,7 @@ There is a **BRONZE AWARD** for this game, which only requires the player to win
 
 > Christmas is on the line! For a mischievous edge-up, dive into the game’s code - a few client-side tweaks to speed, movement, or power might shift the balance... or just help us find that secret weapon we misplaced!
 
-During gameplay, the following script files (or files containing scripts) are loaded. These can be viewed and downloaded in Chrome browser's developer mode:
+During gameplay, the following script files (or files containing scripts) are loaded. They can be viewed and downloaded in Chrome browser's developer mode:
 
 - `game.html`
 - `elfIds.js`
@@ -426,7 +426,7 @@ During gameplay, the following script files (or files containing scripts) are lo
 - `reconnecting-websocket.min.js`
 - `phaser-snowball-game.js`
 
-There are many ways to tweak client-side code so that the player has an advantage. The approach described here may not cover all of them. The parameters of interest can be found in `phaser-snowball-game.js`, near the start of the file.
+There are many ways to tweak client-side code so that the player gains an advantage. The approach described here may not cover all of them. The parameters of interest can be found in `phaser-snowball-game.js`, near the start of the file.
 
 ```
 class SnowBallGame extends Phaser.Scene {
@@ -468,7 +468,7 @@ The variable `this.playerMoveSpeed` can be found in a few lines later in the sam
 let futurePosOffset = -(this.playerMoveSpeed * (delta / 1000));
 ```
 
-It appears to determine the player's offset at each update. The larger the value of `this.playerMoveSpeed`, the larger the magnitude of offset. Hence a LARGER value of `this.playerMoveSpeed` would enable the player to move FASTER.
+This statement appears to determine the player's offset at each update. The larger the value of `this.playerMoveSpeed`, the larger the magnitude of offset. Hence a LARGER value of `this.playerMoveSpeed` would enable the player to move FASTER.
 
 Another variable `this.throwRateOfFire` appears to be related to the rate at which snowballs can be thrown by the player. It is used once in the `calcSnowballTrajectory()` function in the script:
 
@@ -482,16 +482,16 @@ As suggested in the comment, one intention of this conditional statement is to c
 
 There are various other interesting variables such as `this.alabasterElvesThrowDelayMin`, `this.alabasterElvesThrowDelayMax`, `this.alabasterElvesIncompacitateTime` and `this.playerIncompacitateTime` etc, but they are either not used at all in the code or commented out.
 
-Using the "Override content" function in the Sources tab in Chrome, the player can maintain a local modified copy of `phaser-snowball-game.js`. **FOR SILVER AWARD**, the player can try to play and win a game with `this.playerMoveSpeed` and `this.throwRateOfFire` modified to the following values, for example:
+Using the "Override content" function in the Sources tab in Chrome, the player can maintain a local modified copy of `phaser-snowball-game.js`. **FOR SILVER AWARD**, the player can try to play and win a multiplayer game with `this.playerMoveSpeed` and `this.throwRateOfFire` modified to the following values, for example:
 
 - `this.playerMoveSpeed = 600;`
 - `this.throwRateOfFire = 5;`
 
 **FOR GOLD AWARD**, the player needs to launch a secret weapon. The code for this weapon is found in the script `reconnecting-websocket.min.js`.
 
-![Code for bomb](files/Act2/snowball3.png)
+![Code for bomber](files/Act2/snowball3.png)
 
-The function `window.bgDebug` takes an argument `e` which appears to be a Javascript *object* (key-value pair) since it has a property `type` which is checked at the start of the function. The code with the `if` block has some mention of a "bomb", so this is likely to be the secret weapon. One of the conditions for the `if` statement to evaluate to true is for the value `e.type` to be equal to the string "`moasb_start`".
+The function `window.bgDebug` takes an argument `e` which appears to be a Javascript *object* (key-value pair) since it has a property `type` which is checked at the start of the function. The code with the `if` block has some mention of a "bomber", so this is likely to be the secret weapon. One of the conditions for the `if` statement to evaluate to true is for the value `e.type` to be equal to the string "`moasb_start`".
 
 To trigger the secret weapon, the player can start the game, go into the browser's developer mode and run the following statements in the Console tab:
 
