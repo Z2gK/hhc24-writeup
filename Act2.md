@@ -517,7 +517,7 @@ The player gets the **GOLD AWARD** once this secret weapon is triggered in singl
 
 ## Microsoft KC7
 
-There are four sections to this challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. Completion of two sections gives the player a **SILVER AWARD** while completing four gives **GOLD**. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
+This challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. There are four sections in total - the player gets the **SILVER AWARD** when two sections are completed, and the **GOLD AWARD** for four. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
 
 ### Section 1: KQL 101
 
