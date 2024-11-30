@@ -383,7 +383,7 @@ $r2.RawContent }
 
 ![Setting cookie attempts](files/Act2/powershell3.png)
 
-The `Set-Cookie` header used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
+The `Set-Cookie` header is used to send cookies from the server to the client, with the expectation that the client can send it back in response later.  The previous command can be slightly modified to include the `attempts` and `Path` cookies.
 
 ```
 $tokenstring = "67c7aef0d5d3e97ad2488babd2f4c749"; 
@@ -401,7 +401,7 @@ $r2.RawContent }
 
 ![Setting cookie attempts](files/Act2/powershell4.png)
 
-This changes the value of the `attempts` cookie and it completes the **GOLD** challenge.
+This changes the value of the `attempts` cookie and completes the **GOLD** challenge.
 
 
 ## Snowball Showdown
@@ -509,11 +509,82 @@ This creates a new object `foo`, assigns the string `moasb_start` to `foo.type` 
 
 ![Secret weapon](files/Act2/snowball4.png)
 
-Triggering this secret weapon in single or multiplayer modes will claim the player the **GOLD AWARD**.
+The player gets the **GOLD AWARD** once this secret weapon is triggered in single or multiplayer mode.
 
 ## Microsoft KC7
 
 There are four sections to this challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. Completion of two sections gives the player a **SILVER AWARD** while completing four gives **GOLD**. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
+
+### Section 1: KQL 101
+
+Q1: Enter and submit `let's do this` to start.
+
+Q2: Run the KQL command to show the first 10 rows in the `Employees` table and then submit `when in doubt take 10` into the text field.  
+```
+Employees
+| take 10
+```
+
+Q3: This query counts the total number of rows (i.e. number of elves) in the `Employees` table. It returns 90.  
+```
+Employees
+| count
+```
+
+Q4: This query returns the row in the `Employees` table where the role is that of a "Chief Toy Maker", i.e. Shiny Upatree.  
+```
+Employees
+| where role=="Chief Toy Maker" 
+```
+
+Q5: Enter and submit `operator` to continue.
+
+Q6: To find out the number of emails Angel Candysalt has received, first look for her email address from the `Employees` table using this query:  
+```
+Employees 
+|where name=="Angel Candysalt"
+```
+Her email is `angel_candysalt@santaworkshopgeeseislands.org`. To find out the number of emails received, run the following (32 in total):  
+```
+Email 
+| where recipient == "angel_candysalt@santaworkshopgeeseislands.org"
+| count 
+```
+
+Q7: This question asks about the number of distinct websites visted by Twinkle Frostington. First find out Twinkle's IP address from the `Employees` table:  
+```
+Employees 
+| where name=="Twinkle Frostington"
+```
+Twinkle's source IP is `10.10.0.36`, as seen from the `ip_addr` field. Using this IP address,the number of distinct URLs can be counted from the `OutboundNetworkEvents` table (there are 4):  
+```
+OutboundNetworkEvents
+| where src_ip=="10.10.0.36" 
+| distinct url 
+| count
+```
+
+Q8: This query counts the number of distinct domains in the `PassiveDns` table which contain the word "green" (there are 10):  
+```
+PassiveDns
+| where domain contains "green" 
+| distinct domain 
+| count 
+```
+
+Q9: This query returns the number of distinct URLs visited by elves with first name "Twinkle" (8 URLs in total):  
+```
+let twinkle_ips =
+Employees 
+| where name has "Twinkle" 
+| distinct ip_addr; 
+OutboundNetworkEvents 
+| where src_ip in (twinkle_ips) 
+| distinct url 
+| count 
+```
+
+### Section 2: Operation Surrender
 
 
 
