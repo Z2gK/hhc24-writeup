@@ -21,10 +21,10 @@ Links to write-ups for challenges:
    - [Powershell](Act2.md#powershell)
    - [Snowball Showdown](Act2.md#snowball-showdown)
    - [Microsoft KC7](Act2.md#microsoft-kc7)
-	 - [Section 1: KQL 101](Act2.md#section-1:-kql-101)
-	 - [Section 2: Operation Surrender](Act2.md#section-2:-operation-surrender)
-	 - [Section 3: Operation Snowfall](Act2.md#section-3:-operation-snowfall)
-	 - [Section 4: Echoes in the Frost](Act2.md#section-4:-echoes-in-the-frost)
+	 - [Section 1: KQL 101](Act2.md#section-1-kql-101)
+	 - [Section 2: Operation Surrender](Act2.md#section-2-operation-surrender)
+	 - [Section 3: Operation Snowfall](Act2.md#section-3-operation-snowfall)
+	 - [Section 4: Echoes in the Frost](Act2.md#section-4-echoes-in-the-frost)
 4. Act 3
 
 

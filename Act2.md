@@ -7,6 +7,10 @@ Act 2 consists of 5 challenges.
 3. [Powershell](#powershell)
 4. [Snowball Showdown](#snowball-showdown)
 5. [Microsoft KC7](#microsoft-kc7)
+   - [Section 1: KQL 101](section-1-kql-101)
+   - [Section 2: Operation Surrender](#section-2-operation-surrender)
+   - [Section 3: Operation Snowfall](#section-3-operation-snowfall)
+   - [Section 4: Echoes in the Frost](#section-4-echoes-in-the-frost)
 
 ## Mobile Analysis
 
