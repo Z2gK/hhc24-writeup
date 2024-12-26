@@ -271,7 +271,7 @@ Finally, enter **EXPERTTURKEYCARVERMEDAL** in the Admin Console to claim the **G
 
 ### A different approach
 
-The file `Preparations-drone-name.csv` has not been used in the write-up for Gold and Silver here. It is in fact the clue for one of the drone's name. This file can be imported into [Google MyMaps](https://www.google.com/mymaps) and then opened in Google Earth. There is a total of 8 points which when zoomed in and examined in sequence in Google Earth, reveal surface features that resemble the characters that spell out the name "ELF-HAWK".
+The file `Preparations-drone-name.csv` has not been used above. It is in fact the clue for one of the drone's name. This file can be imported into [Google MyMaps](https://www.google.com/mymaps) and then opened in [Google Earth](https://earth.google.com). There is a total of 8 points which when zoomed in and examined in sequence in Google Earth, reveal surface features that resemble the characters that spell out the name "ELF-HAWK".
 
 ![The letter E](files/Act2/dronepath7.jpg)
 
@@ -517,7 +517,7 @@ The player gets the **GOLD AWARD** once this secret weapon is triggered in singl
 
 ## Microsoft KC7
 
-This challenge which revolves around using Kusto Query Language (KQL) to analyse logs from a malware incident. There are four sections in total - the player gets the **SILVER AWARD** when two sections are completed, and the **GOLD AWARD** for four. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
+This challenge revolves around using the Kusto Query Language (KQL) to analyse logs from a malware incident. There are four sections in total - the player gets the **SILVER AWARD** when two sections are completed, and the **GOLD AWARD** for all four. The challenge can be accessed at <http://kc7cyber.com/go/hhc24>.
 
 ### Section 1: KQL 101
 
@@ -560,7 +560,7 @@ Q7: This question asks about the number of distinct websites visted by Twinkle F
 Employees 
 | where name=="Twinkle Frostington"
 ```  
-Twinkle's source IP is `10.10.0.36`, as seen from the `ip_addr` field. Using this IP address,the number of distinct URLs can be counted from the `OutboundNetworkEvents` table (there are 4):  
+Twinkle's source IP is `10.10.0.36`, as seen from the `ip_addr` field. Using this IP address, the number of distinct URLs can be counted from the `OutboundNetworkEvents` table (there are 4):  
 ```
 OutboundNetworkEvents
 | where src_ip=="10.10.0.36" 
@@ -602,8 +602,8 @@ Q3: This query counts the number of recipients of the phishing email (22 in tota
 ```
 Email 
 | where subject contains "surrender" 
-|distinct recipient 
-|count 
+| distinct recipient 
+| count 
 ```
 
 Q4: This query filters out the phishing emails and lists the phishing links. All of them point to the file `Team_Wombley_Surrender.doc`.  
@@ -630,13 +630,13 @@ Employees
 | where name == "Joyelle Tinseltoe"
 | distinct hostname 
 ```  
-Then, query the `ProcessEvents` table to return events around when the phishing link was clicked (from Q5):
+Then, query the `ProcessEvents` table to return events around when the phishing link was clicked (timestamp is `2024-11-27T14:11:45Z` from Q5):
 ```
 ProcessEvents
 | where timestamp between(datetime("2024-11-27T14:00:00Z") .. datetime("2024-11-27T17:00:00Z"))
 | where hostname == "Elf-Lap-W-Tinseltoe" 
 ```  
-Eight records are returned, and two of them shows the creation of the file `C:\Users\Public\AppData\Roaming\keylogger.exe`, as seen in the `process_commandline` field. Hence `keylogger.exe` is the name of the file created.
+Eight records are returned, and two of them show the creation of the file `C:\Users\Public\AppData\Roaming\keylogger.exe`, as seen in the `process_commandline` field. Hence `keylogger.exe` is the name of the file created.
 
 Q7: This query returns the flag for the section (`a2V5bG9nZ2VyLmV4ZQ==`):  
 ```
@@ -649,7 +649,7 @@ print base64_encoded
 
 Q1: Enter and submit `snowfall` to begin.
 
-Q2: From the results of this query, it is observed that the source IP giving rise to the highest number failed logins for each username is `59.171.58.12`:  
+Q2: From the results of this query, it is observed that the source IP giving rise to the highest number of failed logins for each username is `59.171.58.12`:  
 ```
 AuthenticationEvents 
 | where result == "Failed Login" 
@@ -661,15 +661,15 @@ AuthenticationEvents
 Q3: This query counts the number of accounts impacted where there was a successful login from `59.171.58.12`. There are 23 unique accounts.  
 ```
 AuthenticationEvents 
-|where result=="Successful Login" and src_ip=="59.171.58.12" 
-|distinct username 
-|count
+| where result=="Successful Login" and src_ip=="59.171.58.12" 
+| distinct username 
+| count
 ```
 
 Q4: This query filters out the successful login attempts from the malicious IP address. The `description` field for all records read `User successfully logged onto <hostname> via RDP`. Hence the service used to access the accounts is `RDP`.  
 ```
 AuthenticationEvents 
-|where result=="Successful Login" and src_ip=="59.171.58.12" 
+| where result=="Successful Login" and src_ip=="59.171.58.12" 
 ```
 
 Q5: To find the file exfiltrated from Alabaster's laptop requires a few queries. First, his hostname needs to be identified from the `Employees` table:  
@@ -677,7 +677,7 @@ Q5: To find the file exfiltrated from Alabaster's laptop requires a few queries.
 Employees 
 | where name contains "Alabaster" 
 ```  
-His hostname is `Elf-Lap-A-Snowball`. The second step is to determine the time where his machine was logged into:  
+His hostname is `Elf-Lap-A-Snowball`. The second step is to determine the time when his machine was logged into:  
 ```
 AuthenticationEvents
 |where result=="Successful Login" and src_ip=="59.171.58.12" and hostname=="Elf-Lap-A-Snowball" 
@@ -688,11 +688,11 @@ ProcessEvents
 | where timestamp between(datetime("2024-12-11T00:00:00Z") .. datetime("2024-12-21T00:00:00Z"))
 | where hostname == "Elf-Lap-A-Snowball"
 ```  
-There is an event at `2024-12-16T15:51:52Z` where the command `copy C:\Users\alsnowball\AppData\Local\Temp\Secret_Files.zip \\wocube\share\alsnowball\Secret_Files.zip` is executed. It copies out the file `Secret_Files.zip` to some network storage.
+There is an event at `2024-12-16T15:51:52Z` where the command `copy C:\Users\alsnowball\AppData\Local\Temp\Secret_Files.zip \\wocube\share\alsnowball\Secret_Files.zip` was executed. It copies out the file `Secret_Files.zip` to some network drive.
 
 Q6: Reviewing the logs returned from the previous query, it can be observed that `C:\Windows\Users\alsnowball\EncryptEverything.exe` was run at `2024-12-17T10:40:12Z`. The name of the malicious file run on Alabaster's laptop is `EncryptEverything.exe`.
 
-Q7: This query returns the flag for the section (RW5jcnlwdEV2ZXJ5dGhpbmcuZXhl):  
+Q7: This query returns the flag for the section (`RW5jcnlwdEV2ZXJ5dGhpbmcuZXhl`):  
 ```
 let flag = "EncryptEverything.exe"; 
 let base64_encoded = base64_encode_tostring(flag); 
@@ -703,7 +703,7 @@ print base64_encoded
 
 Q1: Enter and submit `stay frosty` to start.
 
-Q2: This question investigates when Noel Boetie received the first phishing email about the breached credential, Noel's email address needs to be identified first using this query:  
+Q2: This question investigates when Noel Boetie received the first phishing email about the breached credential. Noel's email address needs to be identified first using this query:  
 ```
 Employees 
 | where name=="Noel Boetie" 
@@ -718,11 +718,10 @@ Email
 
 Q3: The record at `2024-12-12T14:48:55Z` from the previous query includes a link `https://holidaybargainhunt.io/published/files/files/echo.exe`. Examining the `OutboundNetworkEvents` table and inspecting the records would reveal when Noel clicked on the link:  
 ```
-Use the outgoing network log 
-OutboundNetworkEvents 
+OutboundNetworkEvents
 | where url contains "holidaybargainhunt.io" 
 ```  
-Three records are returned and the first one shows the request for `echo.exe` at `2024-12-12T15:13:55Z` from the IP address `10.10.0.9`. This IP address belongs to Noel can be verified using the `Employees` table results from the previous question.
+Three records are returned and the first one shows the request for `echo.exe` at `2024-12-12T15:13:55Z` from the IP address `10.10.0.9`. This IP address belongs to Noel and can be verified using the `Employees` table results from the previous question.
 
 Q4: The IP address for the domain where the file was hosted can be found from the `PassiveDns` table (DNS logs).  
 ```
@@ -768,7 +767,7 @@ The logs show that `frosty.zip` was extracted at `2024-12-24T17:19:45Z` using th
 
 Q10: The name of the property assigned to the new registry key is `frosty`, as indicated in the Powershell command from the previous query.
 
-Q11: This query returns the flag for the section (ZnJvc3R5):  
+Q11: This query returns the flag for the section (`ZnJvc3R5`):  
 ```
 let finalflag = "frosty"; 
 let base64_encoded = base64_encode_tostring(finalflag); 
