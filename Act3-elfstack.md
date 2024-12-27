@@ -179,4 +179,100 @@ The hostname of the domain computer is `SleighRider`.
 Q6: What was the IP address of the system you found in the previous question?  
 Answer: 172.24.25.12
 
-The IP address for `SleighRIder` can be found in the event filtered out in Q5.
+The IP address for `SleighRider` can be found in the event filtered out in Q5.
+
+Q7: A process was launched when the user executed the program AFTER they downloaded it. What was that Process ID number (digits only please)?  
+Answer: 10014
+
+The event filtered out in Hard mode Q5 shows the downloading of the malicious file at `2024-09-15T14:36:26Z`. The user may have run the downloaded executable shortly after and it is reasonable to search the logs for process creation events (Event ID 1) within 2 minutes of downloading using this query.  
+` FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND event.Hostname == "SleighRider.northpole.local" AND @timestamp >= "2024-09-15T14:36:26.000Z" AND @timestamp <= "2024-09-15T14:38:26.000Z" AND event.EventID == 1`
+
+6 events are filtered out and it can be seen that one of them runs the executable `C:\Users\elf_user02\Downloads\howtosavexmas\howtosavexmas.pdf.exe` whose name is very similar to the zip file downloaded. This event, copied below, has process ID 10014:
+
+```
+{ "@timestamp": "2024-09-15T14:37:50.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccountName": "SYSTEM", "event.AccountType": "User", "event.Category": "Process Create (rule: ProcessCreate)", "event.Channel": "Microsoft-Windows-Sysmon/Operational", "event.CommandLine": "\"C:\\Users\\elf_user02\\Downloads\\howtosavexmas\\howtosavexmas.pdf.exe\" ", "event.Company": "-", "event.CurrentDirectory": "C:\\Users\\elf_user02\\Downloads\\howtosavexmas\\", "event.Description": "-", "event.Domain": "NT AUTHORITY", "event.EventID": 1, "event.EventTime": "2024-09-15T14:37:50.000Z", "event.EventType": "INFO", "event.FileVersion": "-", "event.Hashes": "MD5=790F0E0E9DBF7E9771FF9F0F7DE9804C,SHA256=7965DB6687032CB6A3D875DF6A013FA61B9804F98618CE83688FBA546D5EC892,IMPHASH=B4C6FFF030479AA3B12625BE67BF4914", "event.Hostname": "SleighRider.northpole.local", "event.Image": "C:\\Users\\elf_user02\\Downloads\\howtosavexmas\\howtosavexmas.pdf.exe", "event.IntegrityLevel": "High", "event.Keywords": "-9223372036854775808", "event.LogonGuid": "{face0b26-426d-660c-650f-7d0500000000}", "event.LogonId": "0x57d0f65", "event.MoreDetails": "Process Create:", "event.OpcodeDisplayNameText": "Info", "event.OpcodeValue": 0, "event.OriginalFileName": "-", "event.ParentCommandLine": "C:\\Windows\\Explorer.EXE", "event.ParentImage": "C:\\Windows\\explorer.exe", "event.ParentProcessGuid": "{face0b26-e149-6606-9300-000000000700}", "event.ParentProcessId": 5680, "event.ParentUser": "NORTHPOLE\\elf_user02", "event.ProcessGuid": "{face0b26-426e-660c-eb0f-000000000700}", "event.ProcessID": 10014, "event.ProcessId": 8096, "event.Product": "-", "event.ProviderGuid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}", "event.RecordNumber": 723, "event.RuleName": "-", "event.Severity": "INFO", "event.SeverityValue": 2, "event.SourceModuleName": "inSysmon", "event.SourceModuleType": "im_msvistalog", "event.SourceName": "Microsoft-Windows-Sysmon", "event.Task": 1, "event.TerminalSessionId": 1, "event.ThreadID": 6340, "event.User": "NORTHPOLE\\elf_user02", "event.UserID": "S-1-5-18", "event.Version": 5, "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "SleighRider.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+Q8: Did the attacker's payload make an outbound network connection? Our ElfSOC analysts need your help identifying the destination TCP port of this connection.  
+Answer: 8443
+
+Since the outbound network connection was made by the executable `howtosavexmas.pdf.exe`, querying for a similar string in the the application name fields should filter out this event:
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND event.Hostname == "SleighRider.northpole.local" AND (event.Application LIKE "*howtosavexmas*" OR event.ApplicationInformation_ApplicationName LIKE "*howtosavexmas")`
+
+Only one event is filtered out and the destination port (8443) is recorded in the `event.NetworkInformation_DestinationPort` field:  
+```
+{ "@timestamp": "2024-09-15T14:37:50.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.Application": "\\device\\harddiskvolume3\\users\\elf_user02\\downloads\\howtosavexmas\\howtosavexmas.pdf.exe", "event.ApplicationInformation_ApplicationName": "\\device\\harddiskvolume3\\users\\elf_user02\\downloads\\howtosavexmas\\howtosavexmas.pdf.exe", "event.ApplicationInformation_ProcessID": 8096, "event.Category": "Filtering Platform Connection", "event.Channel": "Security", "event.DestAddress": "103.12.187.43", "event.DestPort": 8080, "event.Direction": "%%14593", "event.EventID": 5156, "event.EventTime": "2024-09-15T14:37:50.000Z", "event.EventType": "AUDIT_SUCCESS", "event.FilterInformation_FilterRunTimeID": 0, "event.FilterInformation_LayerName": "Connect", "event.FilterInformation_LayerRunTimeID": 48, "event.FilterRTID": 0, "event.Hostname": "SleighRider.northpole.local", "event.Keywords": "-9214364837600034816", "event.LayerName": "%%14611", "event.LayerRTID": 48, "event.MoreDetails": "The Windows Filtering Platform has permitted a connection.", "event.NetworkInformation_DestinationAddress": "103.12.187.43", "event.NetworkInformation_DestinationPort": 8443, "event.NetworkInformation_Direction": "Outbound", "event.NetworkInformation_Protocol": 6, "event.NetworkInformation_SourceAddress": "172.24.25.12", "event.NetworkInformation_SourcePort": 64543, "event.OpcodeDisplayNameText": "Info", "event.OpcodeValue": 0, "event.ProcessID": 4, "event.Protocol": 6, "event.ProviderGuid": "{54849625-5478-4994-A5BA-3E3B0328C30D}", "event.RecordNumber": 734596,
+...
+"event.Version": 1, "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "SleighRider.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+The timestamp of this event is `2024-09-15T14:37:50.000Z` which is consistent with the timestamp of the process creation event in Hard mode Q7.
+
+Q9: The attacker escalated their privileges to the SYSTEM account by creating an inter-process communication (IPC) channel. Submit the alpha-numeric name for the IPC channel used by the attacker.  
+Answer: ddpvccdbr
+
+For this question, KQL is used as it allows the user to search across multiple fields. Since "pipes" channels for IPC, querying for this string could be helpful:  
+`event_source: "WindowsEvent" AND event.Hostname: "SleighRider.northpole.local"  AND *pipe*`
+
+Indeed 4 events are filtered out, all occurring at `2024-09-15T14:38:22.000Z`. One of them is copied here, logging the creation of `\pipe\ddpvccdbr`:  
+```
+{ "@timestamp": [ "2024-09-15T14:38:22.000Z" ], "@version": [ "1" ], "data_stream.dataset": [ "generic" ], "data_stream.namespace": [ "default" ], "data_stream.type": [ "logs" ], "event_source": [ "WindowsEvent" ], "event.AccountName": [ "elf_user02" ], "event.AccountType": [ "User" ], "event.Channel": [ "System" ], "event.Domain": [ "NORTHPOLE" ], "event.EventID": [ 7045 ], "event.EventTime": [ "2024-09-15T14:38:22.000Z" ], "event.EventType": [ "INFO" ], "event.Hostname": [ "SleighRider.northpole.local" ], "event.ImagePath": [ "cmd.exe /c echo ddpvccdbr &gt; \\\\.\\pipe\\ddpvccdbr" ], "event.Keywords": [ "-9187343239835811840" ], "event.MoreDetails": [ "A service was installed in the system." ], "event.OpcodeDisplayNameText": [ "Info" ], "event.ProcessID": [ 628 ], "event.ProviderGuid": [ "{555908D1-A6D7-4695-8E1E-26931D2012F4}" ], "event.RecordNumber": [ 1571 ], "event.ServiceAccount": [ "LocalSystem" ], "event.ServiceFileName": [ "cmd.exe /c echo ddpvccdbr > \\\\.\\pipe\\ddpvccdbr" ], "event.ServiceName": [ "ddpvccdbr" ], "event.ServiceStartType": [ "demand start" ], "event.ServiceType": [ "user mode service" ], "event.Severity": [ "INFO" ], 
+...
+```
+
+Q10: The attacker's process attempted to access a file. Submit the full and complete file path accessed by the attacker's process.  
+Answer: `C:\Users\elf_user02\Desktop\kkringl315@10.12.25.24.pem`
+
+The event ID for file creation is 4663 and this can be used as a filter. Furthermore, this has to take place after the running of the malicious executable, and hence the timestamp filter here.  
+```
+FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND event.Hostname == "SleighRider.northpole.local" AND @timestamp >= "2024-09-15T14:37:50Z" AND event.EventID == 4663 AND `event.ProcessName` LIKE "*howtosavexmas*"
+```
+
+2 events are filtered out and one of them shows the unusual access of a `.pem` file:
+```
+{ "@timestamp": "2024-09-16T14:45:48.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccessCheckResults": null, "event.AccessCheckResults_READ_CONTROL": null, "event.AccessCheckResults_ReadAttributes": null,
+...
+"event.ObjectClass": null, "event.ObjectDN": null, "event.ObjectGUID": null, "event.ObjectName": "C:\\Users\\elf_user02\\Desktop\\kkringl315@10.12.25.24.pem", "event.ObjectServer": "Security", "event.ObjectType": "File",
+...
+"event.ProcessGuid": "{face0b26-426e-660c-eb0f-000000000700}", "event.ProcessID": 10014,
+...
+"event.ProcessName": "C:\\Users\\elf_user02\\Downloads\\howtosavexmas\\howtosavexmas.pdf.exe"
+...
+"WindowsEvent", "host.ip": "172.18.0.5", "hostname": "SleighRider.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+Q11: The attacker attempted to use a secure protocol to connect to a remote system. What is the hostname of the target server?  
+Answer: KringleSSleigH
+
+The `.pem` file from the previous question accessed by the attacker is likely the private key for the SSH service on a server with IP address `10.12.25.24`. The search can start in sources other than `WindowsEvent` since the target server is likely to run Linux. A KQL query for this IP address across fields may be helpful:  
+`NOT event_source: "WindowsEvent" AND *10.12.25.24*`
+
+This query results in 17 events - 14 are from `AuthLog` and the remainder from `NetFlowPmacct`. A number of `AuthLog` events record SSH connection to the host `kringleSSleigH`, as shown in a sample here:
+```
+{ "@timestamp": [ "2024-09-15T10:55:37.000Z" ], "@version": [ "1" ], "data_stream.dataset": [ "generic" ], "data_stream.namespace": [ "default" ], "data_stream.type": [ "logs" ], "event_source": [ "AuthLog" ], "event.hostname": [ "kringleSSleigH" ], "event.message": [ "Connection from 34.30.110.62 port 39728 on 10.12.25.24 port 22 rdomain \"\"" ], "event.OpcodeDisplayNameText": [ "Unknown" ], "event.service": [ "sshd[6013]:" ], "event.timestamp": [ "2024-09-15T13:55:37.345Z" ], "host.ip": [ "172.18.0.5" ], "hostname": [ "kringleSSleigH" ], "log.syslog.facility.code": [ 1 ], "log.syslog.facility.name": [ "user-level" ], "log.syslog.facility.name.text": [ "user-level" ], "log.syslog.severity.code": [ 5 ], "log.syslog.severity.name": [ "notice" ], "log.syslog.severity.name.text": [ "notice" ], "tags": [ "match" ], "type": [ "syslog" ], "_id": "778ce349bbac7b003ed1a5f55efb670abe537766", "_index": ".ds-logs-generic-default-2024.12.16-000001", "_score": null }
+```
+
+Q12: The attacker created an account to establish their persistence on the Linux host. What is the name of the new account created by the attacker?  
+Answer: ssdh
+
+Record of account creation should be found in the authentication log. The query here can help by listing the description of all events in a single column.  
+`FROM .ds-logs-* | WHERE event_source == "AuthLog" AND event.hostname == "kringleSSleigH" | STATS count(*) BY event.message`
+
+92 unique event descriptions (found in `event.message` field) are listed. Looking through the list, it is noted that there are several failed logins with different usernames, which is evidence of a brute force attack on the host. Then there are some events relating to user and group creation and password change for a user `ssdh`. This is the new account created by the attacker. The event copied below records the creation of this account. This can be found using the query here:  
+`FROM .ds-logs-* | WHERE event_source == "AuthLog" AND event.hostname == "kringleSSleigH" AND event.message LIKE "*ssdh*"`
+
+```
+{ "@timestamp": "2024-09-16T14:59:46.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.OpcodeDisplayNameText": "Unknown", "event.hostname": "kringleSSleigH", "event.message": "new user: name=ssdh, UID=1002, GID=1002, home=/home/ssdh, shell=/bin/bash, from=/dev/pts/6", "event.service": "useradd[6207]:", "event.timestamp": "2024-09-16T17:59:46.121Z", "event_source": "AuthLog", "host.ip": "172.18.0.5", "hostname": "kringleSSleigH", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+Q13: The attacker wanted to maintain persistence on the Linux host they gained access to and executed multiple binaries to achieve their goal. What was the full CLI syntax of the binary the attacker executed after they created the new user account?  
+Answer: `/usr/sbin/usermod -a -G sudo ssdh`
+
+Authentication events on this host should capture some commands run by the attacker. By filtering out and examining the events AFTER the creation of the new account (at `2024-09-16T14:59:46.000Z`), the actual command can be identified. This query filters out 185 events and the single event of interest reads ` kkringl315 : TTY=pts/5 ; PWD=/opt ; USER=root ; COMMAND=/usr/sbin/usermod -a -G sudo ssdh` in the `event.message` field.  
+`FROM .ds-logs-* | WHERE event_source == "AuthLog" AND hostname == "kringleSSleigH" AND @timestamp >= "2024-09-16T14:59:46.000Z" | KEEP @timestamp, event.message`
+
+Q14: The attacker enumerated Active Directory using a well known tool to map our Active Directory domain over LDAP. Submit the full ISO8601 compliant timestamp when the first request of the data collection attack sequence was initially recorded against the domain controller.  
+Answer: 2024-09-16T11:10:12-04:00
+
+TBC
+
