@@ -274,5 +274,67 @@ Authentication events on this host should capture some commands run by the attac
 Q14: The attacker enumerated Active Directory using a well known tool to map our Active Directory domain over LDAP. Submit the full ISO8601 compliant timestamp when the first request of the data collection attack sequence was initially recorded against the domain controller.  
 Answer: 2024-09-16T11:10:12-04:00
 
+The domain controller's FQDN is `"dc01.northpole.local` and the LDAP unecrypted port is 389. Using this filter and sorting the events by timestamp, the earliest such event can be identified.  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND hostname == "dc01.northpole.local" AND event.ServicePort == 389 | SORT @timestamp ASC`
+
+```
+{ "@timestamp": "2024-09-16T15:10:12.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccessCheckResults": null,
+...
+"event.ClientAddress": null, "event.ClientCreationTime": null, "event.ClientIPaddress": "172.24.25.22:24273", "event.ClientName": null,
+...
+"event.DCName": null, "event.DSName": null, "event.DSType": null, "event.Date": "2024-09-16T11:10:12-04:00", "event.DeletedRule_RuleID": null, "event.DeletedRule_RuleName": null, "event.Description": "The following client performed a SASL (Negotiate/Kerberos/NTLM/Digest) LDAP bind without requesting signing (integrity verification), or performed a simple bind over a clear text (non-SSL/TLS-encrypted) LDAP connection.",
+...
+"event.ServiceIpAddress": "172.24.25.153", "event.ServiceName": "dc01.northpole.local", "event.ServiceName_ServiceID": null, "event.ServicePort": 389, "event.ServicePrincipalNames": null,
+...
+```
+
+This event occured at `2024-09-16T11:10:12-04:00`.
+
+Q15: The attacker attempted to perform an ADCS ESC1 attack, but certificate services denied their certificate request. Submit the name of the software responsible for preventing this initial attack.  
+Answer: KringleGuard
+
+Using the `WindowsEvent` source and the domain controller's hostname as the starting point, the types of events can be listed using this query:  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND hostname == "dc01.northpole.local" | STATS count(*) BY event.Category`
+
+50 different values (including nulls) for the `event.Category` field are listed and the results show only one event with description "Certification Services - Certificate Request Denied". This event can then be filtered out using this query:  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND hostname == "dc01.northpole.local" AND event.Category == "Certification Services - Certificate Request Denied"`
+
+```
+{ "@timestamp": "2024-09-16T15:14:12.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AdditionalInformation_CallerComputer": null, "event.AdditionalInformation_RequestedUPN": "administrator@northpole.local", "event.AdditionalInformation_RequesterComputer": "10.12.25.24", "event.CallerComputer": null, "event.Category": "Certification Services - Certificate Request Denied", "event.CertificateInformation_CertificateAuthority": "elf-dc01-SeaA", "event.CertificateInformation_CertificateTemplate": null, "event.CertificateInformation_RequestedTemplate": "Administrator", "event.CertificateTemplateInformation_CertificateTemplateName": null, "event.Computer": "dc01.northpole.local", "event.Date": "2024-09-16T11:14:12-04:00", "event.Description": "A certificate request was made for a certificate template, but the request was denied because it did not meet the criteria.", "event.Details_ModificationType": null, "event.Details_NewSecuritySettings": null, "event.EventID": 4888, "event.Keywords": "Audit Failure", "event.LevelText": "Information", "event.LogName": "Security", "event.ModifierInformation_Computer": null, "event.ModifierInformation_UserName": null, "event.OpcodeDisplayNameText": "Unknown", "event.ReasonForRejection": "KringleGuard EDR flagged the certificate request.", "event.Source": "Microsoft-Windows-Security-Auditing", "event.User": "N/A", "event.UserInformation_UPN": null, "event.UserInformation_UserName": "elf_user@northpole.local", "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "dc01.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+A more detailed description can be found in the `event.ReasonForRejection` field, i.e. "KringleGuard EDR flagged the certificate request". Hence the name of the EDR software is KringleGuard.
+
+Q16: We think the attacker successfully performed an ADCS ESC1 attack. Can you find the name of the user they successfully requested a certificate on behalf of?  
+Answer: nutcrakr
+
+Using the same query from the previous question, the certificate issuance event can be filtered out by going through the descriptions in the `event.Category` field. There is one description which reads "Certification Services - Certificate Issuance" with only one event tagged. This event can be similary filtered out using this query:  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND hostname == "dc01.northpole.local" AND event.Category == "Certification Services - Certificate Issuance"`
+
+The name of the user can be found in the `event.UserInformation_UPN`, i.e. `nutcrakr@northpole.local`.  
+```
+{ "@timestamp": "2024-09-16T15:15:12.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AdditionalInformation_CallerComputer": "172.24.25.153", "event.AdditionalInformation_RequestedUPN": null, "event.AdditionalInformation_RequesterComputer": "10.12.25.24", "event.CallerComputer": null, "event.Category": "Certification Services - Certificate Issuance", "event.CertificateInformation_CertificateAuthority": "elf-dc01-SeaA", "event.CertificateInformation_CertificateTemplate": "ElfUsers", "event.CertificateInformation_RequestedTemplate": null, "event.CertificateTemplateInformation_CertificateTemplateName": null, "event.Computer": "dc01.northpole.local", "event.Date": "2024-09-16T11:15:12-04:00", "event.Description": "A certificate was issued to a user.", "event.Details_ModificationType": null, "event.Details_NewSecuritySettings": null, "event.EventID": 4886, "event.Keywords": "Audit Success", "event.LevelText": "Information", "event.LogName": "Security", "event.ModifierInformation_Computer": null, "event.ModifierInformation_UserName": null, "event.OpcodeDisplayNameText": "Unknown", "event.ReasonForRejection": null, "event.Source": "Microsoft-Windows-Security-Auditing", "event.User": "N/A", "event.UserInformation_UPN": "nutcrakr@northpole.local", "event.UserInformation_UserName": "elf_user@northpole.local", "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "dc01.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+Q17: One of our file shares was accessed by the attacker using the elevated user account (from the ADCS attack). Submit the folder name of the share they accessed.  
+Answer: WishLists
+
+The Windows event ID for network file share access is 5140. Starting with the `WindowsEvent` logs and filtering by the username `nutcrakr`, 7 events are found using this KQL query:  
+`event_source: "WindowsEvent" AND "nutcrakr" AND event.EventID: "5140"`
+
+The last event records the name of the file share `WishLists` in fields such as `event.ShareName`, `event.ShareInformation_SharePath` and `event.ShareInformation_ShareName`.  
+```
+{ "@timestamp": [ "2024-09-16T15:18:43.000Z" ], "@version": [ "1" ], "data_stream.dataset": [ "generic" ], "data_stream.namespace": [ "default" ], "data_stream.type": [ "logs" ], "event_source": [ "WindowsEvent" ], "event.AccessList": [ "%%4416\r\n\t\t\t\t" ], "event.AccessMask": [ "0x1" ], "event.AccessRequestInformation": [ "," ], "event.AccessRequestInformation_Accesses": [ "ReadData (or ListDirectory)" ], "event.AccessRequestInformation_AccessMask": [ "0x1" ], "event.Category": [ "File Share" ], "event.Channel": [ "Security" ], "event.EventID": [ 5140 ], "event.EventTime": [ "2024-09-16T15:18:43.000Z" ], "event.EventType": [ "AUDIT_SUCCESS" ], "event.Hostname": [ "dc01.northpole.local" ], "event.IpAddress": [ "34.30.110.62" ], "event.IpPort": [ "53378" ], "event.Keywords": [ "-9214364837600034816" ], "event.MoreDetails": [ "A network share object was accessed." ], "event.NetworkInformation": [ "," ], "event.NetworkInformation_ObjectType": [ "File" ], "event.NetworkInformation_SourceAddress": [ "34.30.110.62" ], "event.NetworkInformation_SourcePort": [ 53378 ], "event.ObjectType": [ "File" ], "event.OpcodeDisplayNameText": [ "Info" ], "event.OpcodeValue": [ 0 ], "event.ProcessID": [ 4 ], "event.ProviderGuid": [ "{54849625-5478-4994-A5BA-3E3B0328C30D}" ], "event.RecordNumber": [ 498420 ], "event.Severity": [ "INFO" ], "event.SeverityValue": [ 2 ], "event.ShareInformation_ShareName": [ "\\\\*\\WishLists" ], "event.ShareInformation_SharePath": [ "\\??\\C:\\WishLists" ], "event.ShareLocalPath": [ "\\??\\C:\\WishLists" ], "event.ShareName": [ "\\\\*\\WishLists" ], "event.SourceModuleName": [ "inSecurityEvent" ], "event.SourceModuleType": [ "im_msvistalog" ], "event.SourceName": [ "Microsoft-Windows-Security-Auditing" ], "event.Subject_AccountDomain": [ "NORTHPOLE" ], "event.Subject_AccountName": [ "nutcrakr" ], "event.Subject_LogonID": [ "0xD8FDB3" ], "event.Subject_SecurityID": [ "S-1-5-21-3699322559-1991583901-1175093138-1112" ], "event.SubjectDomainName": [ "NORTHPOLE" ], "event.SubjectLogonId": [ "0xd8fdb3" ], "event.SubjectUserName": [ "nutcrakr" ], "event.SubjectUserSid": [ "S-1-5-21-3699322559-1991583901-1175093138-1112" ], "event.Task": [ 12808 ], "event.ThreadID": [ 5692 ], "event.Version": [ 1 ], "host.ip": [ "172.18.0.5" ], "hostname": [ "dc01.northpole.local" ], "log.syslog.facility.code": [ 1 ], "log.syslog.facility.name": [ "user-level" ], "log.syslog.facility.name.text": [ "user-level" ], "log.syslog.severity.code": [ 5 ], "log.syslog.severity.name": [ "notice" ], "log.syslog.severity.name.text": [ "notice" ], "tags": [ "match" ], "type": [ "syslog" ], "_id": "82b195229ccd0033eb11df25e6af34a5530a0ecf", "_index": ".ds-logs-generic-default-2024.12.16-000001", "_score": null }
+```
+
+Q18: The naughty attacker continued to use their privileged account to execute a PowerShell script to gain domain administrative privileges. What is the password for the account the attacker used in their attack payload?  
+Answer: fR0s3nF1@k3_s
+
 TBC
+
+Q19: The attacker then used remote desktop to remotely access one of our domain computers. What is the full ISO8601 compliant UTC EventTime when they established this connection?  
+Answer: 2024-09-16T15:35:57.000Z
+
+Q20: The attacker is trying to create their own naughty and nice list! What is the full file path they created using their remote desktop connection?  
+Answer: `"C:\Windows\system32\NOTEPAD.EXE" C:\WishLists\santadms_only\its_my_fakelst.txt`
 
