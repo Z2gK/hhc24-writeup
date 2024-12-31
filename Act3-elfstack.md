@@ -355,7 +355,7 @@ Such events are captured in the `WindowsEvent` log and the `event.LogonType` fie
 ```
 
 Q20: The attacker is trying to create their own naughty and nice list! What is the full file path they created using their remote desktop connection?  
-Answer: `"C:\Windows\system32\NOTEPAD.EXE" C:\WishLists\santadms_only\its_my_fakelst.txt`
+Answer: `C:\WishLists\santadms_only\its_my_fakelst.txt`
 
 File paths are typically recorded as part of the command line. There are fields that record this information, such as `event.TargetFilename` and `event.CommandLine`, and their values can be listed using this query:  
 `FROM .ds-logs-* | WHERE event_source == "WindowsEvent"| STATS count(*) BY event.CommandLine`
