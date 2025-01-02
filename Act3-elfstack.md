@@ -36,7 +36,7 @@ This is a sample event from the source:
 In the sample here, the field name `hostname` contains the name of the system (`kringleSSleigH`) the event originated from.
 
 Q4: Which event_source has the second highest number of events related to it?  
-Answer: NetflowPmacct
+Answer: `NetflowPmacct`
 
 Results from the query in Easy Q2 can be used for this question. The source `NetflowPmacct` comes in second with 34,679 events.
 
@@ -49,11 +49,7 @@ Similar to Q3, one can examine a log sample from the source `NetflowPmacct` usin
 
 
 This is a sample event from the source:  
-```
-{ "@timestamp": "2024-09-15T14:37:46.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccessCheckResults": null, "event.AccessCheckResults_READ_CONTROL": null, 
-...
-"event.Workstation": null, "event.WorkstationName": null, "event.additional_info": null, "event.bytes": 626, "event.dst_host": "", "event.event_type": "purge", "event.host": null, "event.hostname": null, "event.http_protocol": null, "event.ip": null, "event.ip_dst": "172.24.25.25", "event.ip_proto": "tcp", "event.ip_src": "35.190.59.101", "event.message": null, "event.method": null, "event.packets": 1, "event.param1": null, "event.param10": null, "event.param11": null, "event.param2": null, "event.param3": null, "event.param4": null, "event.param5": null, "event.param6": null, "event.param7": null, "event.param8": null, "event.param9": null, "event.port_dst": 51894, "event.port_src": 443, "event.protocol": null, "event.response_size": null, "event.service": null, "event.serviceGuid": null, "event.src_host": "", "event.status_code": null, "event.timestamp": null, "event.timestamp_end": "0000-00-00T00:00:00-00:00", "event.timestamp_start": "2024-09-15T10:37:46-04:00", "event.updateGuid": null, "event.updateRevisionNumber": null, "event.updateTitle": null, "event.url": null, "event.user_identifier": null, "event_source": "NetflowPmacct", "host.ip": "172.18.0.5", "hostname": "kringleconnect", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }
-```
+`{ "@timestamp": "2024-09-15T14:37:46.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.AccessCheckResults": null, "event.AccessCheckResults_READ_CONTROL": null, ... "event.Workstation": null, "event.WorkstationName": null, "event.additional_info": null, "event.bytes": 626, "event.dst_host": "", "event.event_type": "purge", "event.host": null, "event.hostname": null, "event.http_protocol": null, "event.ip": null, "event.ip_dst": "172.24.25.25", "event.ip_proto": "tcp", "event.ip_src": "35.190.59.101", "event.message": null, "event.method": null, "event.packets": 1, "event.param1": null, "event.param10": null, "event.param11": null, "event.param2": null, "event.param3": null, "event.param4": null, "event.param5": null, "event.param6": null, "event.param7": null, "event.param8": null, "event.param9": null, "event.port_dst": 51894, "event.port_src": 443, "event.protocol": null, "event.response_size": null, "event.service": null, "event.serviceGuid": null, "event.src_host": "", "event.status_code": null, "event.timestamp": null, "event.timestamp_end": "0000-00-00T00:00:00-00:00", "event.timestamp_start": "2024-09-15T10:37:46-04:00", "event.updateGuid": null, "event.updateRevisionNumber": null, "event.updateTitle": null, "event.url": null, "event.user_identifier": null, "event_source": "NetflowPmacct", "host.ip": "172.18.0.5", "hostname": "kringleconnect", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }`
 
 The field name `event.port_dst` for the destination port can be found from inspection.
 
