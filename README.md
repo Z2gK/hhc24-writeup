@@ -5,17 +5,17 @@ Challenges in ![SANS Holiday Hack Challenge 2024](https://www.sans.org/mlp/holid
 ![Orientation](files/Prologue/start.png)
 
 Links to write-ups for challenges:
-1. [Prologue - all Silver and Gold](Prologue.md)
+1. [Prologue - Silver and Gold for all](Prologue.md)
    - [First Terminal](Prologue.md#first-terminal)
    - [Elf Connect](Prologue.md#elf-connect)
    - [Elf Minder 9000](Prologue.md#elf-minder-9000)
-2. [Act 1 - all Silver and Gold](Act1.md)
+2. [Act 1 - Silver and Gold for all](Act1.md)
    - [cURLing](Act1.md#curling)
    - [Frosty Keypad](Act1.md#frosty-keypad)
    - Hardware Hacking 101
 	 - [Part 1](Act1.md#hardware-hacking-part-1)
 	 - [Part 2](Act1.md#hardware-hacking-part-2)
-3. [Act 2 - all Silver and Gold](Act2.md)
+3. [Act 2 - Silver and Gold for all](Act2.md)
    - [Mobile Analysis](Act2.md#mobile-analysis)
    - [Drone Path](Act2.md#drone-path)
    - [Powershell](Act2.md#powershell)
@@ -27,9 +27,5 @@ Links to write-ups for challenges:
 	 - [Section 4: Echoes in the Frost](Act2.md#section-4-echoes-in-the-frost)
 4. Act 3
    - [Elf Stack - Silver and Gold](Act3-elfstack.md)
-
-
-# Interesting finds
-
-1. *Joke generating function in Act I Hardware Hacking Part 1*
+   - [Santa Vision - Silver and Gold](Act3-santavision.md)
 
