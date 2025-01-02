@@ -4,7 +4,7 @@ Challenges in ![SANS Holiday Hack Challenge 2024](https://www.sans.org/mlp/holid
 
 ![Orientation](files/Prologue/start.png)
 
-Links to write-ups for challenges:
+Links to write-ups for most of the challenges (only Act 3 is not complete):
 1. [Prologue - Silver and Gold for all](Prologue.md)
    - [First Terminal](Prologue.md#first-terminal)
    - [Elf Connect](Prologue.md#elf-connect)
