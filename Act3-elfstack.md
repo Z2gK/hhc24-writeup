@@ -21,7 +21,7 @@ The `event_source` field records the log source. This ES|QL query counts the num
 Q2: Which event_source has the fewest number of events related to it?  
 Answer: `AuthLog`
 
-The ES|QL query here counts the number of logs from each `event_source`. The `AuthLog` source has 269 events, the least amongst the 4 source.  
+The ES|QL query here counts the number of logs from each `event_source`. The `AuthLog` source has 269 events, the least amongst the 5 sources.  
 `FROM .ds-logs-* | STATS COUNT(*) by event_source`
 
 Q3: Using the event_source from the previous question as a filter, what is the field name that contains the name of the system the log event originated from?  
@@ -30,7 +30,7 @@ Answer: `hostname`
 For this question, one can examine a log sample from the source `AuthLog` by filtering out events from this source using this  query:  
 `FROM .ds-logs-* | WHERE event_source == "AuthLog"`
 
-This is a sample event from the source:
+This is a sample event from the source:  
 `{ "@timestamp": "2024-09-16T15:48:01.000Z", "@version": "1", "data_stream.dataset": "generic", "data_stream.namespace": "default", "data_stream.type": "logs", "event.OpcodeDisplayNameText": "Unknown", "event.hostname": "kringleSSleigH", "event.message": "pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)", "event.service": "CRON[6715]:", "event.timestamp": "2024-09-16T18:48:01.232Z", "event_source": "AuthLog", "host.ip": "172.18.0.5", "hostname": "kringleSSleigH", "log.syslog.facility.code": 1, "log.syslog.facility.name": "user-level", "log.syslog.facility.name.text": "user-level", "log.syslog.severity.code": 5, "log.syslog.severity.name": "notice", "log.syslog.severity.name.text": "notice", "tags": "match", "type": "syslog" }`
 
 In the sample here, the field name `hostname` contains the name of the system (`kringleSSleigH`) the event originated from.
