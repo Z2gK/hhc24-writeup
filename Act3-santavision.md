@@ -7,13 +7,13 @@ Each track in this challenge has four objectives relating to different actions o
 - C: Find out the code name for the elves' secret operation
 - D: Demote Wombley and Alabaster and check the `northpolefeeds` feed for Santa's image
 
-The Silver and Gold tracks require the achieving of the same four objectives, but in different ways.
+Both tracks require the achievement of the same four objectives, though in different ways.
 
-In order to spin up the Santa Vision instance, the player has to click on the "Time Travel" button and wait. Once the instance is ready, the IP address (henceforth to be referred to as `<IP address>`) will be shown in the "Target" field. This IP address is not constant and will change between subsequent spin-ups of the challenge instance.
+In order to spin up the Santa Vision instance, the player has to click on the "Time Travel" button and wait. Once the instance is ready, the IP address (henceforth to be referred to as `<IP address>`) will be shown in the "Target" field. This IP address is not constant and will change between restarts of the challenge instance.
 
 ![Startup screen](files/Act3/santavision-startup.png)
 
-It is necessary to scan the instance for interesting open ports if the player is spinning up the instance for the first times. The result of a basic `nmap` scan (without any options) on the instance's IP address show 3 open ports - 22, 8000 and 9001.
+It is necessary to scan the instance for interesting open ports if the player is spinning it up for the first time. The result of a basic `nmap` scan (without any options) on the instance's IP address shows 3 open ports - 22, 8000 and 9001.
 
 ```
 Nmap scan report for 222.175.44.34.bc.googleusercontent.com (34.44.175.222)
@@ -27,7 +27,7 @@ PORT     STATE SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 42.54 seconds
 ```
 
-Port 8000 hosts the web service and is the entry point for this challenge. It can be accessed with a browser at `http://<IP address>:8000`, which directs the player to a login page.
+Port 8000 hosts the web service and is the entry point for this challenge. It can be accessed using a browser at `http://<IP address>:8000`, which directs the player to a login page.
 
 ![Login screen](files/Act3/santavision-login.png)
 
@@ -37,7 +37,7 @@ The starting point for the Silver track is the login page at `http://<IP address
 
 ### Silver A
 
-The HTML source for the login page has a line that suggests that the username and password are `elfanon`.
+The HTML source for the login page has a line that suggests that the username and password are both `elfanon`.
 
 ![elfanon credentials](files/Act3/santavision-SilverA.png)
 
@@ -47,24 +47,24 @@ Once logged in, the player will be brought to a different page that shows text b
 
 ### Silver B
 
-To turn on the monitors, a username and password need to be provided in the "Connect As" and "Password" fields.
+To turn on the monitors, the username and password need to be provided in the "Connect As" and "Password" fields.
 
 ![elfmonitor](files/Act3/santavision-elfmonitor.png)
 
-The two buttons "List Available Clients" and "List Available Roles" near the bottom of the page provide hints for the credential. Clicking on each of these buttons show different messages in the text box above:
+The two buttons "List Available Clients" and "List Available Roles" near the bottom of the page provide hints for the credential. Clicking on each of these buttons show different messages in the message box:
 
 - "List Available Clients":`Available clients: 'elfmonitor', 'WomblyC', 'AlabasterS'`
 - "List Available Roles": `Available roles: 'SiteDefaultPasswordRole', 'SiteElfMonitorRole', 'SiteAlabsterSAdminRole', 'SiteWomblyCAdminRole'`
 
-After some trying, the player would discover that the username and password combination of `elfmonitor` and `SiteElfMonitorRole` turns the monitors on, provided also that the `<IP address>` and port value of 9001 (discovered from the `nmap` scan) are entered in the "Camera Feed Server" and "Camera Feed Port" fields.
+After a few tries, the player would discover that the username and password combination of `elfmonitor` and `SiteElfMonitorRole` turns the monitors on, provided also that the `<IP address>` and port value of 9001 (discovered from the `nmap` scan) are entered in the "Camera Feed Server" and "Camera Feed Port" fields.
 
 The answer for Silver B is `elfmonitor`.
 
 ### Silver C
 
-With the monitors powered on, it is possible to connect to feeds. The first of which is `northpolefeeds`, mentioned in the objective description for Silver B. Once `northpolefeeds` is entered into the "Broadcast Feed" field and the player connects by clicking on "Connect to broadcast feed" button, images will show up on the monitors. These are propaganda from the Wombley and Alabaster factions.
+With the monitors powered on, it is possible to connect to feeds. The first of which is `northpolefeeds`, mentioned in the objective description for Silver B. Once `northpolefeeds` is entered into the "Broadcast Feed" field and the player connects by clicking on "Connect to broadcast feed" button, images show up on the monitors. These are propaganda from the Wombley and Alabaster factions.
 
-The next feed to check is `frostbitfeed`, as mentioned in the objective description for Silver C. Once the player is connected to this feed, the message box cycles through a series of messages, and one of them reads "Additional messages available in santafeed", which points to the next step.
+The next feed to check is `frostbitfeed`, as mentioned in the objective description for Silver C. Once the player is connected to this feed, the message box cycles through a series of messages. One of them reads "Additional messages available in santafeed", which points to the next step.
 
 Another set of messages are shown in the message box once the player is connected to `santafeed`. One of them holds the answer to Silver C: "Sixteen elves launched operation: Idemcerybu". 
 
@@ -80,7 +80,7 @@ This part is about demoting Wombley and Alabaster using an MQTT message so that 
 - Santa role: superadmin
 - AlabasterS role: admin
 
-Incidentally, additional text fields appear once the player turns on the monitors using the `elfmonitor` credential. Publishing to feeds seem to be permitted. Since the `santafeed` messages show there are too many admins (Wombley, Alabaster and Santa), it may make sense to enable the `singleAdminMode`, which is set to `false`, as indicated by one of the messages.
+Incidentally, additional text fields appear once the player turns on the monitors using the `elfmonitor` credential. Publishing to feeds seem to be permitted. Since the `santafeed` messages suggest that there are too many admins (Wombley, Alabaster and Santa), it may make sense to enable the `singleAdminMode`, which is set to `false`, as indicated by one of the messages.
 
 ![Demoting elves](files/Act3/santavision-SilverD.png)
 
@@ -96,7 +96,7 @@ The starting point for the Gold track is also `http://<IP address>:8000`. Howeve
 
 ### Gold A
 
-There is a line at the bottom of the login screen informing the player to check the `sitestatus` feed.
+There is a line at the bottom of the login screen informing the player of the availability of the `sitestatus` feed.
 
 ![Login screen](files/Act3/santavision-login.png)
 
@@ -104,14 +104,14 @@ This feed can be viewed in the same way as for the Silver track. Simply log into
 
 The most interesting messages in the `sitestatus` feed reads "File downloaded: /static/sv-application-2024-SuperTopSecret-9265193/applicationDefault.bin". This appears to be the path to a file. Indeed, this file `applicationDefault.bin` can be accessed and downloaded at the URL `http://<IP address>:8000/static/sv-application-2024-SuperTopSecret-9265193/applicationDefault.bin`.
 
-The Linux `file` utility identifies this file as a data file that contains the `jffs2` filesystem.
+The Linux `file` utility identifies this file as a data file that contains a `jffs2` filesystem.
 
 ```
 $ file applicationDefault.bin 
 applicationDefault.bin: Linux jffs2 filesystem data little endian
 ```
 
-According to the hints from Rib Bonbowford, the tool at <https://github.com/onekey-sec/jefferson/> can be used to extract files from this filesystem. Details regarding the setting up of this tool is not covered here, but it is rather straightforward and best done using a Python virtual environment `venv`. As mentioned on the github page, once the tool is installed, it is but a matter of running the command `jefferson filesystem.img -d outdir`. The extracted files will be available in the directory name `outdir`.
+According to the hints from Rib Bonbowford, the tool at <https://github.com/onekey-sec/jefferson/> can be used to extract files from this filesystem. Details regarding the setting up of this tool is not covered here, but it is rather straightforward and best done using a Python virtual environment `venv`. As mentioned on the github page, once the tool is installed, it is but a matter of running the command `jefferson filesystem.img -d outdir`. The extracted files will be available in the directory defined by the `-d` option - in this case `outdir`.
 
 At this stage, the most interesting file can be found at the path `outdir/app/src/accounts/views.py`. There are lines of code that suggest the existence of another interesting file, which could be an `sqlite` database.
 
@@ -149,7 +149,7 @@ UNIQUE (username)
 );
 ```
 
-There are two tables in the database: `alembic_version` and `users`. The interesting data can be found in the `users` table:  
+There are two tables in the database: `alembic_version` and `users`. Interesting data is found in the `users` table:  
 ```
 sqlite> select * from alembic_version 
    ...> ; 
@@ -164,17 +164,17 @@ The answer for Gold A is `santaSiteAdmin`.
 
 ### Gold B
 
-The hints from Rib Bonbowford mention HTTP headers. After logging in using Gold A credentials, the browser's developer mode can used to examine the HTTP response headers, where the next set of credentials for turning on the monitors can be found.
+The hint from Rib Bonbowford mentions HTTP headers. After logging in using Gold A credentials, the browser's developer mode can be used to examine the HTTP response headers, where the next set of credentials for turning on the monitors can be found.
 
-![HTTP headers](santavision-headers.png)
+![HTTP headers](files/Act3/santavision-headers.png)
 
-The username (`santashelper2024`) and password can be found in the `BrkrUser` and `BrkrPswd` headers in the HTTP response. It should be noted that the password is of the form `playerSantaHelperPass<random_number>` and is not the same across instances, i.e. some random number would be appended to the end of the string `playerSantaHelperPass` each time. Except for the use of different username and password, the procedure for turning on the monitors is similar to that described in Silver B.
+The username (`santashelper2024`) and password can be found in the `BrkrUser` and `BrkrPswd` headers in the HTTP response. It should be noted that the password is of the form `playerSantaHelperPass<random_number>` and is not the same across instances - some random number would be appended to the end of the string `playerSantaHelperPass` each time. Except for the use of different username and password, the procedure for turning on the monitors is similar to that described in Silver B.
 
 The answer for Gold B is `santashelper2024`.
 
 ### Gold C
 
-The answer to Silver D is in fact the ROT16 encoding of the Gold C answer (vaguely alluded to in the feed message "Sixteen elves..."). To derive the Gold C answer, simply apply ROT10 to the Silver C answer. This can be done on sites such as <https://rot13.com/>. ROT10("Idemcerybu") is "Snowmobile", which is the answer for Gold C.
+The answer to Silver C "Idemcerybu" is the ROT16 encoding of the Gold C answer (vaguely alluded to in the `santafeed` feed message "Sixteen elves..."). To derive the Gold C answer, simply apply ROT10 to the Silver C answer. This can be done on sites such as <https://rot13.com/>. ROT10("Idemcerybu") is "Snowmobile", which is the answer for Gold C.
 
 ### Gold D
 
